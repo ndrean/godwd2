@@ -1,7 +1,7 @@
   Rails.application.routes.draw do
     namespace :api do
       namespace :v1 do
-        resources :users, only: [:index, :show, :profile]
+        resources :users, only: [:index, :show]
         post '/getUserToken', to: 'user_token#create'
         get '/profile', to: 'users#profile'
         post '/createUser', to: 'users#create_user'
