@@ -11,6 +11,7 @@ import facebookConfig from "../config/facebookConfig";
 const uri = process.env.REACT_APP_URL;
 
 export default function LoginForm() {
+  console.log("render Login");
   const [showModal, setShowModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);

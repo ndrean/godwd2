@@ -12,7 +12,7 @@ const TableRow = ({
   onhandlePush,
   //notify,
 }) => {
-  console.log("render Row");
+  // console.log("render Row");
   return (
     <tr key={event.id}>
       <td>{event.user.email}</td>

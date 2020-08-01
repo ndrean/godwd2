@@ -14,6 +14,8 @@ import AddEventModal from "./AddEventModal";
 import AddEventForm from "./AddEventForm";
 import fetchWithToken from "../helpers/fetchWithToken";
 
+import CardItem from "./CardItem";
+
 // utilitaries for fetch (Rails token with @rails/ujs)
 // import fetchWithToken from "../helpers/fetchWithToken"; // token for POST, PATCH, DELETE
 import fetchAll from "../helpers/fetchAll"; // returns data after PATCH or POST depending upon endpoint
@@ -77,9 +79,9 @@ const DataTable = () => {
 
   // upload db
   React.useEffect(() => {
-    setLoading(true);
-    bePatient(loading);
-    async function fetchData() {
+    //setLoading(true);
+    bePatient(true);
+    (async function fetchData() {
       try {
         const responseEvents = await fetch(eventsEndPoint);
         const responseUsers = await fetch(usersEndPoint);
@@ -92,10 +94,11 @@ const DataTable = () => {
       } catch (err) {
         throw new Error(err);
       } finally {
-        setLoading(false);
+        //setLoading(false);
+        bePatient(false);
       }
-    }
-    fetchData().catch((err) => console.log(err));
+    })(); //.catch(() => console.log);
+    //fetchData().catch((err) => console.log(err));
   }, []);
 
   // remove row from table
@@ -110,11 +113,17 @@ const DataTable = () => {
             Accept: "application/json",
           },
         }); // then new updated rows
-        const response = await query.json();
-        if (response.status === 200) {
+
+        console.log(query.status);
+        if (query.status !== 200) {
+          return returnUnauthorized();
+        }
+        if (query.status === 200) {
+          const response = await query.json();
+          if (response.status === 401) {
+            return returnUnauthorized();
+          }
           setEvents((prev) => [...prev].filter((ev) => ev.id !== event.id));
-        } else {
-          returnUnauthorized();
         }
       } catch (err) {
         console.log(err);
@@ -195,25 +204,33 @@ const DataTable = () => {
       .then((res) => upLoadToCL(res))
       .then((data) => {
         if (!indexEdit) {
+          // no index <=> POST to '/events'
           fetchAll({
             method: "POST",
             index: "",
             body: data,
             status: 201,
-          }).then((result) => {
-            if (result) {
-              setEvents(result);
-            }
-          });
+          })
+            .then((result) => {
+              if (result) {
+                setEvents(result);
+              }
+            })
+            .catch((err) => console.log(err));
         } else if (indexEdit) {
+          // index <=> PATCH to 'events/:id'
           fetchAll({
             method: "PATCH",
             index: indexEdit,
             body: data,
             status: 200,
-          }).then((result) => {
-            setEvents(result);
-          });
+          })
+            .then((result) => {
+              if (result) {
+                setEvents(result);
+              }
+            })
+            .catch((err) => console.log(err));
         }
       });
     handleClose(); // reset
@@ -336,6 +353,7 @@ const DataTable = () => {
         </Container>
       ) : (
         <>
+          <br />
           <Container>
             <Row style={{ justifyContent: "center" }}>
               <Button
@@ -364,6 +382,22 @@ const DataTable = () => {
                 />
               </AddEventModal>
             </Row>
+          </Container>
+          <br />
+          <Container>
+            {events &&
+              events.map((event) => {
+                return (
+                  <CardItem
+                    key={event.id}
+                    event={event}
+                    onhandleRemove={(e) => handleRemove(e, event)}
+                    onhandleEdit={() => handleEdit(event)}
+                    onhandleNotif={(e) => handleNotif(e, event)}
+                    onhandlePush={() => handlePush(event)}
+                  />
+                );
+              })}
           </Container>
           <br />
           <Table bordered size="md" striped responsive="sm">

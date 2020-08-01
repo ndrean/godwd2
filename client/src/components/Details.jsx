@@ -12,7 +12,7 @@ import { faShare, faBell } from "@fortawesome/free-solid-svg-icons";
 function Details({ event, onhandleNotifChange, onhandlePushNotif }) {
   const [show, setShow] = React.useState(false);
 
-  console.log("render Details");
+  // console.log("render Details");
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 

@@ -31,7 +31,7 @@ const AddEventForm = (props) => {
     onhandlePictureCL,
   } = props;
 
-  console.log("render Form");
+  // console.log("render Form");
   // setup SELECT
   const options = [],
     defaultOpt = [];

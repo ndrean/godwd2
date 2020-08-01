@@ -3,7 +3,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 
 function AddEventModal(props) {
-  console.log("render Modal");
+  // console.log("render Modal");
   return (
     <>
       <Modal show={props.show} onHide={props.onhandleClose}>
