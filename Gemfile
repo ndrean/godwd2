@@ -19,10 +19,12 @@ gem 'sidekiq-failures', '~> 1.0'
 gem 'bcrypt', '~> 3.1.7'
 gem 'jwt'
 gem 'knock'
+
+gem 'mailgun-ruby'
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 
-#gem 'cloudinary'
+gem 'cloudinary'
 
 
 # Reduces boot times through caching; required in config/boot.rb

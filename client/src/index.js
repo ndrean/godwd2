@@ -1,16 +1,40 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-
 import MyNavBar from "./components/MyNavBar";
-
+import DataTable from "./components/DataTable";
 import * as serviceWorker from "./serviceWorker";
 
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faTrash,
+  faEdit,
+  faInfoCircle,
+  faPlusSquare,
+  faCheck,
+  faBell,
+  faShare,
+  faPaperPlane,
+  faCamera,
+} from "@fortawesome/free-solid-svg-icons";
+library.add(
+  faTrash,
+  faEdit,
+  faInfoCircle,
+  faPlusSquare,
+  faCheck,
+  faBell,
+  faShare,
+  faPaperPlane,
+  faCamera
+);
+
+// <React.StrictMode></React.StrictMode>
 ReactDOM.render(
-  <React.StrictMode>
+  <>
     <MyNavBar />
-    {/* <LoginForm /> */}
-  </React.StrictMode>,
+    <DataTable />
+  </>,
   document.getElementById("root")
 );
 

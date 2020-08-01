@@ -17,7 +17,7 @@ class Api::V1::UsersController < ApplicationController
     end
     if fb_user.confirm_token.blank? && !fb_user.confirm_email
       fb_user.confirm_token = SecureRandom.urlsafe_base64.to_s
-      UserMailer.register(fb_user.email, fb_user.confirm_token).deliver_now #if fb_user.confirm_token
+      UserMailer.register(fb_user.email, fb_user.confirm_token).deliver_later
       fb_user.save
     end
     if fb_user.confirm_email

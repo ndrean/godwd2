@@ -2,6 +2,7 @@
     namespace :api do
       namespace :v1 do
         resources :users, only: [:index, :show]
+        resources :events, only: [:index, :create, :update, :destroy, :show]
         post '/getUserToken', to: 'user_token#create'
         get '/profile', to: 'users#profile'
         post '/createUser', to: 'users#create_user'
@@ -10,6 +11,9 @@
 
       end
     end
+    root to: 'events#index'
+
+    mount Sidekiq::Web => '/sidekiq'
     
   end
 

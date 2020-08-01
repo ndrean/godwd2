@@ -9,9 +9,9 @@ require "active_storage/engine"
 require "action_controller/railtie"
 require "action_mailer/railtie"
 require "action_mailbox/engine"
-require "action_text/engine"
-require "action_view/railtie"
-require "action_cable/engine"
+#require "action_text/engine"
+#require "action_view/railtie"
+#require "action_cable/engine"
 # require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
@@ -22,6 +22,7 @@ Bundler.require(*Rails.groups)
 module Godwd2
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
+    config.active_job.queue_adapter     = :sidekiq
     config.load_defaults 6.0
     config.autoloader= :classic
 

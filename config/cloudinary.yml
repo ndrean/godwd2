@@ -1,0 +1,19 @@
+---
+development:
+  cloud_name: dd4eq9e3c
+  api_key: "927782549962588"
+  api_secret: 46ZL8Kr6L2PN0ErUW5B6WdnJ7f0
+  enhance_image_tag: true
+  static_file_support: false
+production:
+  cloud_name: dd4eq9e3c
+  api_key: "927782549962588"
+  api_secret: 46ZL8Kr6L2PN0ErUW5B6WdnJ7f0
+  enhance_image_tag: true
+  static_file_support: true
+test:
+  cloud_name: dd4eq9e3c
+  api_key: "927782549962588"
+  api_secret: 46ZL8Kr6L2PN0ErUW5B6WdnJ7f0
+  enhance_image_tag: true
+  static_file_support: false

@@ -10,14 +10,6 @@ import facebookConfig from "../config/facebookConfig";
 
 const uri = process.env.REACT_APP_URL;
 
-// const facebookConfig = {
-//   appId: myAppId,
-//   cookie: true,
-//   xfbml: true,
-//   version: "v7.0",
-//   scope: "email",
-// };
-
 export default function LoginForm() {
   const [showModal, setShowModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);

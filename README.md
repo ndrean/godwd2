@@ -1,3 +1,9 @@
+# Sidekiq
+
+In './config/application', declare `config.active_job.queue_adapter = :sidekiq`
+
+In '/config/Dev-prod', provide `routes.default_url_options[:host] = 'http://localhost:3001'` (otherwise you get ActionView::Template::error missing link, provide :hst parameter, set default_url_options[:host])
+
 # Knock
 
 gem bcrypt, jwt, knock, dotnev-rails, racks-cors
@@ -75,8 +81,6 @@ end
 
 # Bootstrap
 
-# bootstrap
-
 Install in `/client`:
 
 ```bash
@@ -110,6 +114,7 @@ Append the `ProcFile` with the process (React front end, Rails API back end, Sid
 # ProcFile
 web: cd client && PORT=3000 yarn run start
 api: PORT=3001 && bundle exec rails s
+worker: sidekiq (-t 25)?
 ```
 
 and run `foreman start` to run both Weback and Rails servers.
@@ -128,3 +133,35 @@ yarn add react-modal-login
 ```
 > kill -9 $(lsof -t -i tcp:3001)
 ```
+
+# Fontawesome
+
+client:
+
+```bash
+yarn add @fortawesome/fontawesome-svg-core
+yarn add @fortawesome/free-solid-svg-icons
+yarn add @fortawesome/react-fontawesome
+```
+
+<https://fontawesome.com/how-to-use/on-the-web/using-with/react>
+
+Example:
+
+```js
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fab } from "@fortawesome/free-brands-svg-icons";
+import { faCheckSquare, faCoffee } from "@fortawesome/free-solid-svg-icons";
+
+library.add(fab, faCheckSquare, faCoffee);
+```
+
+then don't need to import, just use strings
+
+```js
+<FontAwesomeIcon icon="coffee" />
+```
+
+# CLoudinary
+
+Go to Cloudinary dashboard and download cloudinary.yml and place it into '/config/cloudinary.yml'.
