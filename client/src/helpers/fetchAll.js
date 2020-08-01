@@ -22,7 +22,8 @@ async function fetchAll({ method, index, status, body }) {
       returnUnauthorized();
     }
   } catch (err) {
-    throw new Error(err);
+    console.log(err);
+    // throw new Error(err);
   }
 }
 

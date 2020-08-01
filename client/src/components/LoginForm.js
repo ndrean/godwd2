@@ -16,7 +16,7 @@ export default function LoginForm() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
   const [loggedIn, setLoggedIn] = React.useState(false);
-  // const [initialTab, setInitialTab] = React.useState(null);
+  const [initialTab, setInitialTab] = React.useState(null);
   const [avatar, setAvatar] = React.useState("");
   // const [recoverPasswordSuccess, setRecoverPasswordSuccess] = React.useState(
   //   null
@@ -30,6 +30,7 @@ export default function LoginForm() {
   function closeModal() {
     setShowModal(false);
     setError(null);
+    setInitialTab("login");
   }
 
   function onLogin() {

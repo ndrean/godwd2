@@ -399,7 +399,7 @@ const DataTable = () => {
                 );
               })}
           </Container>
-          <br />
+          {/* <br />
           <Table bordered size="md" striped responsive="sm">
             <thead>
               <tr>
@@ -425,7 +425,7 @@ const DataTable = () => {
                     />
                   ))}
             </tbody>
-          </Table>
+          </Table> */}
         </>
       )}
     </>

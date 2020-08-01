@@ -1,16 +1,17 @@
 class Api::V1::EventsController < ApplicationController
   #skip_before_action :verify_authenticity_token
-  before_action :authenticate_user, only: [:create, :update, :destroy]
+  #before_action :authenticate_user, only: [:create, :update, :destroy]
 
   # curl http://localhost:3000/api/v1/events => ok
   def index 
-    render json:  Event.includes(:user, :itinary).to_json(
-      include: [
+    render json:  
+      Event.joins(:user, :itinary)
+      .where('itinaries.date > ?', Date.today)
+      .to_json( include: [
         user: {only: [:email]},
         itinary: {only: [:date, :start, :end]}
-      ]
-    )
-
+        ]
+      )
   end
 
   #api/v1/events/:id => ok
@@ -49,7 +50,7 @@ class Api::V1::EventsController < ApplicationController
 
   # PATCH/PUT /events/:id
   def update
-    event = Event.find(params[:id])   
+    event = Event.find(params[:id]) 
     # early return
     return render json: {status: 401} if event.user != current_user
     # async purge only for Active Storage since direct upload data is in params
@@ -59,7 +60,7 @@ class Api::V1::EventsController < ApplicationController
     # end
 
     # if we update direct link, then first remove from CL if one exists
-    RemoveDirectLink.perform_later(event.publicID) if event_params[:directCLUrl] && event.directCLUrl
+    RemoveDirectLink.perform_later(event.publicID) if event_params[:directCLurl] && event.directCLurl
 
     if event.update(event_params)
       # if a new picture is saved to Active Storage, update link
@@ -87,9 +88,7 @@ class Api::V1::EventsController < ApplicationController
     # end
     
     #async Active_Job  for Cloudinary
-    logger.debug "......................#{event.publicID}"
-    result = RemoveDirectLink.perform_later(event.publicID) if event.publicID
-    logger.debug "...........................result CL.#{result}"
+    RemoveDirectLink.perform_later(event.publicID) if event.publicID
 
     event.itinary.destroy
     event.destroy

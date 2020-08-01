@@ -16,43 +16,42 @@ const CardItem = ({ event, ...props }) => {
           <Card border="primary" style={{ padding: "10px" }}>
             <Card.Img
               variant="top"
-              src="../assets/portugal.jpg/100px270"
+              src={event.directCLurl || require("../assets/pointreyes.jpg")}
               alt="Card image"
+              fluid="true"
+              style={{ height: "250px" }}
+              // thumbnail="true"
             />
-            {/* <Card.ImgOverlay> */}
-            <Card.Title>{event.itinary.date}</Card.Title>
-            <Card.Text>
-              Organized by: {event.user.email}
-              <br />
-              From: {event.itinary.start} <br />
-              To: {event.itinary.end} <br />
-            </Card.Text>
-            <Card.Footer>
-              <Details
-                event={event}
-                onhandleNotifChange={props.onhandleNotif}
-                onhandlePushNotif={props.onhandlePush}
-              />
-              <Button
-                variant="outline-danger"
-                onClick={props.onhandleRemove}
-                style={{ fontSize: "15px", margin: "15px" }}
-              >
-                <FontAwesomeIcon icon="trash" size="2x" />
-              </Button>
-              <Button
-                variant="outline-dark"
-                onClick={props.onhandleEdit}
-                style={{ fontSize: "15px", margin: "10px" }}
-              >
-                <FontAwesomeIcon icon="edit" size="2x" />
-              </Button>
-            </Card.Footer>
-            {/*
-          
-          
-        </Card.Footer> */}
-            {/* </Card.ImgOverlay> */}
+            <Card.ImgOverlay>
+              <Card.Title>{event.itinary.date}</Card.Title>
+              <Card.Text style={{ fontWeight: "bold", color: "white" }}>
+                Organized by: {event.user.email}
+                <br />
+                From: {event.itinary.start} <br />
+                To: {event.itinary.end} <br />
+              </Card.Text>
+              <Card.Footer>
+                <Details
+                  event={event}
+                  onhandleNotifChange={props.onhandleNotif}
+                  onhandlePushNotif={props.onhandlePush}
+                />
+                <Button
+                  variant="outline-danger"
+                  onClick={props.onhandleRemove}
+                  style={{ fontSize: "15px", margin: "15px" }}
+                >
+                  <FontAwesomeIcon icon="trash" size="2x" />
+                </Button>
+                <Button
+                  variant="outline-dark"
+                  onClick={props.onhandleEdit}
+                  style={{ fontSize: "15px", margin: "10px" }}
+                >
+                  <FontAwesomeIcon icon="edit" size="2x" />
+                </Button>
+              </Card.Footer>
+            </Card.ImgOverlay>
           </Card>
         </Col>
       </Row>

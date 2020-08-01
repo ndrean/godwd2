@@ -51,8 +51,8 @@ class Api::V1::UsersController < ApplicationController
     if user
       user.confirm_token = nil
       user.confirm_email = true
-      user.save
-      return render json: user, status: 200
+      return user.save
+      #return render json: user, status: 200
     end
     render json: { status: 401 }
   end
