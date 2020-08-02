@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import ReactDOM from "react-dom";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import MyNavBar from "./components/MyNavBar";
 import DataTable from "./components/DataTable";
@@ -16,6 +17,7 @@ import {
   faShare,
   faPaperPlane,
   faCamera,
+  faGlobeAmericas,
 } from "@fortawesome/free-solid-svg-icons";
 library.add(
   faTrash,
@@ -26,7 +28,8 @@ library.add(
   faBell,
   faShare,
   faPaperPlane,
-  faCamera
+  faCamera,
+  faGlobeAmericas
 );
 
 // <React.StrictMode></React.StrictMode>

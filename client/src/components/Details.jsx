@@ -7,9 +7,13 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShare, faBell } from "@fortawesome/free-solid-svg-icons";
+import {
+  faShare,
+  // faBell,
+  faSignInAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
-function Details({ event, onhandleNotifChange, onhandlePushNotif }) {
+function Details({ event, onhandlePushNotif }) {
   const [show, setShow] = React.useState(false);
 
   // console.log("render Details");
@@ -19,53 +23,50 @@ function Details({ event, onhandleNotifChange, onhandlePushNotif }) {
   return (
     <>
       <Button variant="outline-primary" onClick={handleShow}>
-        <FontAwesomeIcon icon={faBell} size="2x" />
+        <FontAwesomeIcon icon={faSignInAlt} size="2x" />
       </Button>
 
       <Modal show={show} onHide={handleClose} animation={false}>
         <Modal.Header closeButton>
           <Modal.Title>
+            Date: {event.itinary.date} <br />
             From: {event.itinary.start} <br />
-            To: {event.itinary.end} <br />
-            Date: {event.itinary.date}
+            To: {event.itinary.end}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {/* <p>
-            If you don't find any buddies to invite people, edit the event and
-            select them!
-          </p> */}
-          <hr />
-          {!event.participants ? (
-            <p>
-              If you don't find any buddies to invite people, edit the event and
-              select them!
-            </p>
-          ) : (
-            event.participants.map((participant, idx) => (
-              <Container key={idx}>
-                <Row key={participant.id}>
-                  <Col xs="8">{participant.email}</Col>
-                  <Col xs="4">
-                    <Form.Group controlId="formBasicCheckbox">
-                      <Form.Check
-                        name={idx}
-                        type="checkbox"
-                        label="Notif?"
-                        checked={JSON.parse(participant.notif)}
-                        onChange={onhandleNotifChange}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Container>
-            ))
-          )}
+          <p>
+            Participants{" "}
+            <span style={{ fontSize: "12px" }}>
+              (go to 'edit' to invit buddies)
+            </span>
+          </p>
+          {!event.participants
+            ? null
+            : event.participants.map((participant, idx) => (
+                <Container key={idx}>
+                  <Row key={participant.id}>
+                    <Col xs="8">{participant.email}</Col>
+                    <Col xs="4">
+                      <Form.Group controlId="formBasicCheckbox">
+                        <Form.Check
+                          name={idx}
+                          type="checkbox"
+                          label="Notified"
+                          readOnly
+                          checked={JSON.parse(participant.notif)}
+                          // onChange={onhandleNotifChange}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </Container>
+              ))}
+          <Button variant="primary" onClick={onhandlePushNotif}>
+            <FontAwesomeIcon icon={faShare} /> Ask to participate
+          </Button>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={onhandlePushNotif}>
-            <FontAwesomeIcon icon={faShare} /> Send notifications
-          </Button>
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
@@ -75,4 +76,4 @@ function Details({ event, onhandleNotifChange, onhandlePushNotif }) {
   );
 }
 // export default Details;
-export default React.memo(Details);
+export default Details;

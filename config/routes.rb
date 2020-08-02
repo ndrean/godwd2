@@ -8,7 +8,8 @@
         post '/createUser', to: 'users#create_user'
         get '/mailconfirmation', to: 'users#confirmed_email'
         post '/findCreateFbUser', to: 'users#find_create_with_fb'
-
+        post '/pushDemand', to:'events#receive_demand'
+        get 'itinaries', to: 'itinaries#index'
       end
     end
     root to: 'events#index'

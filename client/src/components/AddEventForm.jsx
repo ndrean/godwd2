@@ -78,7 +78,7 @@ const AddEventForm = (props) => {
           />
         </Form.Group>
         <Form.Group controlId="ControlKiters">
-          <Form.Label>Invite participants</Form.Label>
+          <Form.Label>Participants</Form.Label>
           <Select
             defaultValue={defaultOpt}
             isMulti
@@ -120,7 +120,7 @@ const AddEventForm = (props) => {
 
         <Form.Group controlId="ControlComment">
           <Form.Label>Comments</Form.Label>
-          <Form.Control as="textarea" rows="3" />
+          <Form.Control as="textarea" rows="2" />
         </Form.Group>
 
         <Row style={{ justifyContent: "center" }}>

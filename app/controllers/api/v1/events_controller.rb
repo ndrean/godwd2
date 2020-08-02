@@ -1,12 +1,12 @@
 class Api::V1::EventsController < ApplicationController
   #skip_before_action :verify_authenticity_token
-  #before_action :authenticate_user, only: [:create, :update, :destroy]
+  before_action :authenticate_user, only: 
+    [:create, :update, :destroy]
 
-  # curl http://localhost:3000/api/v1/events => ok
   def index 
     render json:  
       Event.joins(:user, :itinary)
-      .where('itinaries.date > ?', Date.today)
+      .where('itinaries.date > ?', Date.today-1)
       .to_json( include: [
         user: {only: [:email]},
         itinary: {only: [:date, :start, :end]}
@@ -14,7 +14,6 @@ class Api::V1::EventsController < ApplicationController
       )
   end
 
-  #api/v1/events/:id => ok
   def show
     event = Event.find(params[:id])
     return render json: event.to_json(
@@ -29,23 +28,21 @@ class Api::V1::EventsController < ApplicationController
   def create
     event = Event.new(event_params)
     event.user = current_user
-
-    # Active Storage: get the Cloudinary url if a photo is passed in the form
-    #event.url = event.photo.url if event.photo.attached?
-
-    if event.save
-      # if any participant passed in the form, send async email
-      if event.participants
-        event.participants.each do |participant|
-          # event.participant=[{email:xx,notif:xx},..] , 'jsonb' format => participant['email']
-          EventMailer.invitation(participant['email'], event.id)
-            .deliver_later
-        end
+    return render json: event.errors.full_messages, status: :unprocessable_entity if !event.save
+    
+    if event.participants
+      event.participants.each do |participant|
+        # event.participant=[{email:xx,notif:xx},..] , 'jsonb' format => participant['email']
+        participant['notif'] = true
+        EventMailer.invitation(participant['email'], event.id)
+        .deliver_later
       end
-      return render json: { status: 201 }
-    else
-      return render json: event.errors.full_messages, status: :unprocessable_entity 
+      event.save
     end
+    return render json: { status: 201 }
+    
+    # Active Storage: get the Cloudinary url if a photo is passed in the form
+    #event.url = event.photo.url if event.photo.attached?    
   end
 
   # PATCH/PUT /events/:id
@@ -77,8 +74,6 @@ class Api::V1::EventsController < ApplicationController
   
   def destroy
     event = Event.find(params[:id])   
-    # early return if unauthorized
-    logger.debug "...........#{event.user == current_user}"
     return render json: { status: 401 } if event.user != current_user
 
     # async Active_Job for Active Storage
@@ -95,7 +90,14 @@ class Api::V1::EventsController < ApplicationController
     return render json: {status: 200}
   end
 
-  def search
+  # send mail to owner of an event for user to join
+  def receive_demand
+    itinary_id = params[:event][:itinary_id]
+    owner = User.find_by(email: params[:owner])
+    render json: { status: :unprocessable_entity} if !owner
+    EventMailer.demand(current_user.email , owner.email, itinary_id )
+      .deliver_later
+    render json: { status: 200 } 
   end
 
   private
@@ -104,7 +106,7 @@ class Api::V1::EventsController < ApplicationController
       params.require(:event).permit( :user,  :directCLurl, :publicID,  itinary_attributes: [:date, :start, :end], participants: [:email, :notif, :id]) #photo for Active Storage
       #:participants => sp_keys)#, [:email, :id])
     end
-
+    
     def handle_unauthorized(current, user)
       unless current == user
         render :unauthorized, status: 401

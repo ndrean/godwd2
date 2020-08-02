@@ -16,7 +16,7 @@ export default function LoginForm() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
   const [loggedIn, setLoggedIn] = React.useState(false);
-  const [initialTab, setInitialTab] = React.useState(null);
+  const [initialTab, setInitialTab] = React.useState("login");
   const [avatar, setAvatar] = React.useState("");
   // const [recoverPasswordSuccess, setRecoverPasswordSuccess] = React.useState(
   //   null
@@ -25,12 +25,12 @@ export default function LoginForm() {
 
   function openModal() {
     setShowModal(true);
+    setInitialTab("login");
   }
 
   function closeModal() {
     setShowModal(false);
     setError(null);
-    setInitialTab("login");
   }
 
   function onLogin() {
@@ -325,13 +325,11 @@ fields=id,name,email,picture.width(640).height(640)`);
               setResult("");
             }}
             style={{
-              padding: "10px",
+              padding: "5px",
               margin: "auto",
               border: "none",
               backgroundColor: "grey", //"#3b5998",
               color: "white",
-              fontWeight: "bold",
-              fontSize: "20px",
             }}
           >
             {" "}

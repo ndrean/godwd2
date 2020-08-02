@@ -9,7 +9,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
-import TableRow from "./TableRow";
+// import TableRow from "./TableRow";
 import AddEventModal from "./AddEventModal";
 import AddEventForm from "./AddEventForm";
 import fetchWithToken from "../helpers/fetchWithToken";
@@ -22,6 +22,8 @@ import fetchAll from "../helpers/fetchAll"; // returns data after PATCH or POST 
 import returnUnauthorized from "../helpers/returnUnauthorized";
 import { eventsEndPoint, usersEndPoint } from "../helpers/endpoints"; // const endpoints
 import cloudName from "../config/cloudName";
+
+const uri = process.env.REACT_APP_URL;
 
 const DataTable = () => {
   // from db: events= [event:{user, itinary, participants}]
@@ -47,7 +49,6 @@ const DataTable = () => {
   const [indexEdit, setIndexEdit] = React.useState(null);
   // Modal opened/closed
   const [show, setShow] = React.useState(false);
-
   console.log("render table");
   const handleShow = () => {
     setShow(true);
@@ -322,22 +323,27 @@ const DataTable = () => {
     fetchAll({ method: "PATCH", index: event.id, body: formdata, status: 200 });
   }
 
-  // push notification to selected participants on button
-  function handlePush(event) {
-    if (event.participants.find((p) => p.notif)) {
-      const listPush = event.participants
-        .filter((p) => JSON.parse(p.notif))
-        .map((p) => p.email);
-      if (
-        window.confirm(
-          `Confirm to send notifications for the event ${event.itinary.date}, from ${event.itinary.start} to ${event.itinary.end}. Send to: ${listPush}`
-        )
-      ) {
-        handleClose();
-        console.log("PUSH PUSH", listPush);
-      }
-    } else {
-      alert("No one to invite!");
+  // send mail to ask to join an event
+  async function handlePush(event) {
+    const jwt = localStorage.getItem("jwt");
+    const getCurrentUser = await fetch(uri + "/api/v1/profile", {
+      headers: { authorization: "Bearer " + jwt },
+    });
+
+    const currentUser = await getCurrentUser.json();
+    const demand = JSON.stringify({
+      user: currentUser,
+      owner: event.user.email,
+      event: event,
+    });
+    const queryPushDemand = await fetchWithToken(uri + "/api/v1/pushDemand", {
+      method: "POST",
+      body: demand,
+    });
+    const response = await queryPushDemand.json();
+    if (response.status === 200) {
+      window.alert("Mail sent");
+      handleClose();
     }
   }
 
@@ -354,6 +360,7 @@ const DataTable = () => {
       ) : (
         <>
           <br />
+
           <Container>
             <Row style={{ justifyContent: "center" }}>
               <Button
@@ -363,6 +370,7 @@ const DataTable = () => {
               >
                 <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span>
               </Button>
+
               <AddEventModal show={show} onhandleClose={handleClose}>
                 <AddEventForm
                   users={users}
@@ -383,7 +391,9 @@ const DataTable = () => {
               </AddEventModal>
             </Row>
           </Container>
+
           <br />
+
           <Container>
             {events &&
               events.map((event) => {
@@ -399,6 +409,7 @@ const DataTable = () => {
                 );
               })}
           </Container>
+
           {/* <br />
           <Table bordered size="md" striped responsive="sm">
             <thead>

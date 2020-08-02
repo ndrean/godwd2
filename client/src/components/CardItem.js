@@ -5,6 +5,7 @@ import Col from "react-bootstrap/Col";
 import { Card, Button } from "react-bootstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignIn } from "@fortawesome/free-solid-svg-icons";
 
 import Details from "./Details";
 
@@ -13,19 +14,21 @@ const CardItem = ({ event, ...props }) => {
     <Container>
       <Row>
         <Col xs={12}>
-          <Card border="primary" style={{ padding: "10px" }}>
+          <Card border="primary">
+            {/* style={{ padding: "10px" }} */}
             <Card.Img
               variant="top"
               src={event.directCLurl || require("../assets/pointreyes.jpg")}
               alt="Card image"
-              fluid="true"
-              style={{ height: "250px" }}
+              // fluid="true"
+              style={{ height: "250px", opacity: "0.6" }}
+
               // thumbnail="true"
             />
             <Card.ImgOverlay>
               <Card.Title>{event.itinary.date}</Card.Title>
-              <Card.Text style={{ fontWeight: "bold", color: "white" }}>
-                Organized by: {event.user.email}
+              <Card.Text style={{ fontWeight: "bold", fontSize: "20px" }}>
+                Organizer: {event.user.email}
                 <br />
                 From: {event.itinary.start} <br />
                 To: {event.itinary.end} <br />
