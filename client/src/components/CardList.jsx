@@ -371,13 +371,17 @@ const DataTable = () => {
       body: demand,
     });
     const response = await queryPushDemand.json();
-    console.log(response, response.status);
-    if (response.status === 200) {
-      window.alert("Mail sent");
-
+    window.alert("Mail sent");
+    if (response) {
+      const responseEvents = await fetch(eventsEndPoint);
+      const responseUsers = await fetch(usersEndPoint);
+      const dataEvents = await responseEvents.json();
+      const dataUsers = await responseUsers.json();
+      if (dataEvents && dataUsers) {
+        setEvents(dataEvents);
+        setUsers(dataUsers);
+      }
       handleClose();
-    } else {
-      window.alert("Please login to access");
     }
   }
 

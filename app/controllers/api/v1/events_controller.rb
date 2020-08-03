@@ -39,7 +39,7 @@ class Api::V1::EventsController < ApplicationController
       end
       event.save
     end
-    return render json:  {events: Event.all}, status: 201
+    return render json:  {status: 201}
     
     # Active Storage: get the Cloudinary url if a photo is passed in the form
     #event.url = event.photo.url if event.photo.attached?    
@@ -73,7 +73,7 @@ class Api::V1::EventsController < ApplicationController
         event.save
       end
 
-      return render json: {events: Event.all}, status: 200
+      return render json: {status: 200}
     else
       return render json: {errors: event.errors.full_messages},
         status: :unprocessable_entity
@@ -96,7 +96,7 @@ class Api::V1::EventsController < ApplicationController
 
     event.itinary.destroy
     event.destroy
-    return render json: {events: Event.all}, status: 200
+    return render json: {status: 200}
   end
 
   # send mail to owner of an event for user to join
@@ -111,7 +111,7 @@ class Api::V1::EventsController < ApplicationController
     event.save
     EventMailer.demand(current_user.email , owner.email, itinary_id, token )
       .deliver_later
-    return render json: {events: Event.all},  status: 200
+    return render json: {status: 200}  if confirm_demand
   end
 
   
@@ -120,17 +120,16 @@ class Api::V1::EventsController < ApplicationController
     events = Event.joins(:user).where("users.email LIKE ?", params[:name])
     events.each do |event|
       event.participants.each do |p|
-        logger.debug "........T1..#{p['email']} #{p['email'] == params[:user]}"
-        return if p['email'] == params[:user]
-        logger.debug ".......T2..#{p['ptoken']}...#{p['ptoken']== params[:ptoken]}"
+        # logger.debug "........T1..#{p['email']} #{p['email'] == params[:user]}"
         if p['ptoken'] && p['ptoken']== params[:ptoken]
-          
+          # logger.debug ".......T2..#{p['ptoken']}...#{p['ptoken']== params[:ptoken]}"          
           p['notif']=true
+          p['ptoken'] = ''
           event.save
+          return true
         end
       end
     end
-    return render json: {events: Event.all}, status: 201
   end
 
   private
