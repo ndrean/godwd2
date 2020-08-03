@@ -22,9 +22,9 @@ import cloudName from "../config/cloudName"; // for Cloudinary
 
 const uri = process.env.REACT_APP_URL;
 
-export default function CardList() {
-  const [users, setUsers] = useState([]);
-  const [events, setEvents] = useState([]); // [event:{user, itinary, participants, url, publicID}]
+export default function CardList({ users, events, ...props }) {
+  const [nusers, setnUsers] = useState([]);
+  const [nevents, setnEvents] = useState([]); // [event:{user, itinary, participants, url, publicID}]
   const [itinary, setItinary] = useState(""); // array [date, start, end, startGSP, endGPS]
   const [fileCL, setFileCL] = useState("");
   const [previewCL, setPreviewCL] = useState(""); // preview photo
@@ -54,41 +54,41 @@ export default function CardList() {
     setChanged(false);
   };
 
-  React.useEffect(() => {
-    (async function fetchData() {
-      setLoading(true);
-      try {
-        const responseEvents = await fetch(eventsEndPoint);
-        if (responseEvents.ok) {
-          const dataEvents = await responseEvents.json();
-          setEvents(dataEvents);
-        }
-      } catch (err) {
-        setEvents(null);
-        throw new Error(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  // React.useEffect(() => {
+  //   (async function fetchData() {
+  //     setLoading(true);
+  //     try {
+  //       const responseEvents = await fetch(eventsEndPoint);
+  //       if (responseEvents.ok) {
+  //         const dataEvents = await responseEvents.json();
+  //         setnEvents(dataEvents);
+  //       }
+  //     } catch (err) {
+  //       setnEvents(null);
+  //       throw new Error(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   })();
+  // }, []);
 
-  React.useEffect(() => {
-    (async function fetchData() {
-      setLoading(true);
-      try {
-        const responseUsers = await fetch(usersEndPoint);
-        if (responseUsers.ok) {
-          const dataUsers = await responseUsers.json();
-          setUsers(dataUsers);
-        }
-      } catch (err) {
-        setUsers(null);
-        throw new Error(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  // React.useEffect(() => {
+  //   (async function fetchData() {
+  //     setLoading(true);
+  //     try {
+  //       const responseUsers = await fetch(usersEndPoint);
+  //       if (responseUsers.ok) {
+  //         const dataUsers = await responseUsers.json();
+  //         setnUsers(dataUsers);
+  //       }
+  //     } catch (err) {
+  //       setnUsers(null);
+  //       throw new Error(err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   })();
+  // }, []);
 
   // remove row from table
   const handleRemove = async (e, event) => {
@@ -110,7 +110,7 @@ export default function CardList() {
           if (response.status === 401) {
             return returnUnauthorized();
           }
-          setEvents((prev) => [...prev].filter((ev) => ev.id !== event.id));
+          setnEvents((prev) => [...prev].filter((ev) => ev.id !== event.id));
         }
       } catch (err) {
         console.log(err);
@@ -188,7 +188,7 @@ export default function CardList() {
           })
             .then((result) => {
               if (result) {
-                setEvents(result);
+                setnEvents(result);
               }
             })
             .catch((err) => console.log(err));
@@ -201,7 +201,7 @@ export default function CardList() {
           })
             .then((result) => {
               if (result) {
-                setEvents(result);
+                setnEvents(result);
               }
             })
             .catch((err) => console.log(err));
@@ -285,22 +285,23 @@ export default function CardList() {
     });
     const response = await queryPushDemand.json();
     window.alert("Mail sent");
-    if (response) {
-      const responseEvents = await fetch(eventsEndPoint);
-      const responseUsers = await fetch(usersEndPoint);
-      const dataEvents = await responseEvents.json();
-      const dataUsers = await responseUsers.json();
-      if (dataEvents && dataUsers) {
-        setEvents(dataEvents);
-        setUsers(dataUsers);
-      }
-      handleCloseDetail();
-    }
+    handleCloseDetail();
+    // if (response) {
+    //   const responseEvents = await fetch(eventsEndPoint);
+    //   const responseUsers = await fetch(usersEndPoint);
+    //   const dataEvents = await responseEvents.json();
+    //   const dataUsers = await responseUsers.json();
+    //   if (dataEvents && dataUsers) {
+    //     setnEvents(dataEvents);
+    //     setnUsers(dataUsers);
+    //   }
+    //
+    // }
   }
 
   return (
     <>
-      {!events || !users ? (
+      {!nevents || !nusers ? (
         <Container>
           <Row className="justify-content-md-center">
             <BePatient go={loading} />
