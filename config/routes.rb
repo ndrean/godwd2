@@ -10,6 +10,7 @@
         post '/findCreateFbUser', to: 'users#find_create_with_fb'
         post '/pushDemand', to:'events#receive_demand'
         get 'itinaries', to: 'itinaries#index'
+        get 'confirmDemand', to: 'events#confirm_demand'
       end
     end
     root to: 'events#index'

@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import MyNavBar from "./components/MyNavBar";
-import DataTable from "./components/DataTable";
+import CardList from "./components/CardList";
 import * as serviceWorker from "./serviceWorker";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -36,7 +36,7 @@ library.add(
 ReactDOM.render(
   <>
     <MyNavBar />
-    <DataTable />
+    <CardList />
   </>,
   document.getElementById("root")
 );

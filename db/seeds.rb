@@ -8,7 +8,7 @@ User.create!(email:"toto@test.fr", name:"toto", password: "password", confirm_em
 User.create!(email:"t@test.fr", name:"t", password:"password", confirm_email: "true")
 # User.create!(email: "nevendrean@yahoo.fr", password:"password")
 
-2.times do
+3.times do
     Itinary.create!(start: Faker::Address.city, end:Faker::Address.city, date: Faker::Date.between(from: Date.today, to: '2020-09-01') )
 end
 
@@ -28,7 +28,7 @@ arr_i = Array(c..d)
 
 Array(a..b).each do |idx|
     participants = []
-    kiters.each { |k| participants << {email: k, notif: false}}
+    kiters.each { |k| participants << {email: k, notif: true, ptoken:""}}
     Event.create!(user: User.find(idx), itinary: Itinary.find(arr_i.sample), participants: participants)
 end
 

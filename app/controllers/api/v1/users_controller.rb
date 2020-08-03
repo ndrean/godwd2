@@ -35,7 +35,7 @@ class Api::V1::UsersController < ApplicationController
     if user.confirm_token.blank? #&& !user.confirm_email
       user.confirm_token = SecureRandom.urlsafe_base64.to_s
       user.save
-      UserMailer.register(user.email, user.confirm_token).deliver_now
+      UserMailer.register(user.email, user.confirm_token).deliver_later
     end
     
     if user.confirm_email && user.confirm_token.blank?

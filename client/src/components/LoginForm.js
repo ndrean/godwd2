@@ -31,6 +31,7 @@ export default function LoginForm() {
   function closeModal() {
     setShowModal(false);
     setError(null);
+    setInitialTab("login");
   }
 
   function onLogin() {
@@ -56,37 +57,23 @@ export default function LoginForm() {
     }
   }
 
-  // function onRecoverPassword() {
-  //   console.log("__onFotgottenPassword__");
-  //   const email = document.querySelector("#email").value;
-
-  //   if (!email) {
-  //     setError(true);
-  //     setRecoverPasswordSuccess(false);
-  //   } else {
-  //     setError(null);
-  //     setRecoverPasswordSuccess(true);
-  //     setResult({ method: "recoverPassword", recoverEmail: email });
-  //   }
-  // }
-
   async function onLoginSuccess(method, response) {
     setResult({ method, response });
     const { email, password } = response;
 
     if (method === "facebook") {
-      let gAccessToken;
-      if (localStorage.getItem("accessToken")) {
-        gAccessToken = localStorage.getItem("accessToken");
-      } else {
-        const {
-          authResponse: { accessToken }, //, userID },
-        } = response;
-        gAccessToken = accessToken;
-        localStorage.setItem("accessToken", accessToken);
-      }
+      // let gAccessToken;
+      // if (localStorage.getItem("accessToken")) {
+      //   gAccessToken = localStorage.getItem("accessToken");
+      // } else {
+      const {
+        authResponse: { accessToken }, //, userID },
+      } = response;
+      //   gAccessToken = accessToken;
+      //   localStorage.setItem("accessToken", accessToken);
+      // }
       // call Facebook to get user credentials: window.FB.api(userID, (res) =>{ setResult(res.name )})
-      const query = await fetch(`https://graph.facebook.com/me?access_token=${gAccessToken}&
+      const query = await fetch(`https://graph.facebook.com/me?access_token=${accessToken}&
 fields=id,name,email,picture.width(640).height(640)`);
       const {
         id,
@@ -111,17 +98,7 @@ fields=id,name,email,picture.width(640).height(640)`);
       if (queryAppToken.ok) {
         const { access_token } = await queryAppToken.json();
 
-        // const payload = {
-        //   auth: { email, password: name }, //: access_token, access_token },
-        // };
         try {
-          // const queryFbCreateUser = await fetch(uri + "/api/v1/getUserToken", {
-          //   method: "POST",
-          //   body: JSON.stringify(payload),
-          //   headers: { "Content-Type": "application/json" },
-          // });
-          // if (queryFbCreateUser.ok) {
-          // const { jwt } = await queryFbCreateUser.json();
           const getCurrentUser = await fetch(uri + "/api/v1/profile", {
             headers: { authorization: "Bearer " + access_token },
           });
@@ -132,12 +109,10 @@ fields=id,name,email,picture.width(640).height(640)`);
             localStorage.setItem("jwt", access_token);
             localStorage.setItem("user", currentUser.email);
             alert(`Welcome ${currentUser.email}`);
+            setResult(currentUser);
           } else {
             onLoginFail("Check your mail to confirm password update");
           }
-          // } else {
-          //   onLoginFail("Check your mail to confirm password update");
-          // }
         } catch (err) {
           throw new Error(err);
         }
@@ -173,7 +148,7 @@ fields=id,name,email,picture.width(640).height(640)`);
             localStorage.setItem("jwt", jwt);
             localStorage.setItem("user", currentUser.email);
             alert(`Welcome ${currentUser.email}`);
-            setResult("confirmed");
+            setResult(currentUser);
           } else {
             onLoginFail("Check your mail to confirm password update 1");
           }
@@ -214,6 +189,7 @@ fields=id,name,email,picture.width(640).height(640)`);
                   setLoggedIn(true);
                   localStorage.setItem("jwt", jwt);
                   localStorage.setItem("user", currentUser.email);
+                  setResult(currentUser);
                   alert(`Welcome ${currentUser.email}`);
                 } else {
                   onLoginFail("Check your mail to confirm password update 2");
@@ -253,6 +229,7 @@ fields=id,name,email,picture.width(640).height(640)`);
           const currentUser = await getCurrentUser.json();
           if (currentUser.confirm_email && !currentUser.confirm_token) {
             setLoggedIn(true);
+            setResult(currentUser);
             localStorage.setItem("jwt", jwt);
             localStorage.setItem("user", response.email);
             alert(`Welcome ${currentUser.email}`);
@@ -276,10 +253,11 @@ fields=id,name,email,picture.width(640).height(640)`);
     setError(response);
     setLoading(false);
     setLoggedIn(false);
+    setAvatar("");
     setResult({ error: response });
     localStorage.removeItem("jwt");
     localStorage.removeItem("user");
-    //setInitialTab("login");
+    setInitialTab("login");
   }
 
   function startLoading() {
@@ -333,8 +311,8 @@ fields=id,name,email,picture.width(640).height(640)`);
             }}
           >
             {" "}
-            {!avatar && result.response ? (
-              result.response.email
+            {!avatar && result.email ? (
+              result.email
             ) : avatar ? (
               <Image
                 alt="avatar"

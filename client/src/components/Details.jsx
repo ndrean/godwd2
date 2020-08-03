@@ -43,25 +43,27 @@ function Details({ event, onhandlePushNotif }) {
           </p>
           {!event.participants
             ? null
-            : event.participants.map((participant, idx) => (
-                <Container key={idx}>
-                  <Row key={participant.id}>
-                    <Col xs="8">{participant.email}</Col>
-                    <Col xs="4">
-                      <Form.Group controlId="formBasicCheckbox">
-                        <Form.Check
-                          name={idx}
-                          type="checkbox"
-                          label="Notified"
-                          readOnly
-                          checked={JSON.parse(participant.notif)}
-                          // onChange={onhandleNotifChange}
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                </Container>
-              ))}
+            : event.participants
+                .filter((participant) => participant.notif === true)
+                .map((participant, idx) => (
+                  <Container key={idx}>
+                    <Row key={participant.id}>
+                      <Col xs="6">{participant.email}</Col>
+                      <Col xs="3">
+                        <Form.Group controlId="formBasicCheckbox">
+                          <Form.Check
+                            name={idx}
+                            type="checkbox"
+                            label="Notified"
+                            readOnly
+                            checked={JSON.parse(participant.notif)}
+                            // onChange={onhandleNotifChange}
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  </Container>
+                ))}
           <Button variant="primary" onClick={onhandlePushNotif}>
             <FontAwesomeIcon icon={faShare} /> Ask to participate
           </Button>

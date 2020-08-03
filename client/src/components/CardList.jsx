@@ -78,10 +78,7 @@ const DataTable = () => {
     }
   }
 
-  // upload db
-  React.useEffect(() => {
-    //setLoading(true);
-    bePatient(true);
+  function update() {
     (async function fetchData() {
       try {
         const responseEvents = await fetch(eventsEndPoint);
@@ -98,7 +95,31 @@ const DataTable = () => {
         //setLoading(false);
         bePatient(false);
       }
-    })(); //.catch(() => console.log);
+    })();
+  }
+
+  // upload db
+  React.useEffect(() => {
+    //setLoading(true);
+    bePatient(true);
+    update();
+    // (async function fetchData() {
+    //   try {
+    //     const responseEvents = await fetch(eventsEndPoint);
+    //     const responseUsers = await fetch(usersEndPoint);
+    //     const dataEvents = await responseEvents.json();
+    //     const dataUsers = await responseUsers.json();
+    //     if (dataEvents && dataUsers) {
+    //       setEvents(dataEvents);
+    //       setUsers(dataUsers);
+    //     }
+    //   } catch (err) {
+    //     throw new Error(err);
+    //   } finally {
+    //     //setLoading(false);
+    //     bePatient(false);
+    //   }
+    // })(); //.catch(() => console.log);
     //fetchData().catch((err) => console.log(err));
   }, []);
 
@@ -145,24 +166,27 @@ const DataTable = () => {
     e.preventDefault();
 
     // adding boolean  field for notified? to participant
-    let members = [];
-    if (participants) {
-      members = participants.map((p) => {
-        if (!p.hasOwnProperty("email")) {
-          return { email: p, notif: false };
-        } else {
-          return p;
-        }
-      });
-    }
+    // let members = [];
+    // if (participants) {
+    //   members = participants.map((participant) => {
+    //     // if (!participant.hasOwnProperty("email")) {
+    //     return { email: participant, ptoken: null, notif: true };
+    //     // } else {
+    //     //   return participant;
+    //     // }
+    //   });
+    // }
+    console.log(participants);
     // first promise to append non async data to the FormData
     function init(fd) {
       for (const key in itinary) {
+        console.log(key, itinary[key]);
         fd.append(`event[itinary_attributes][${key}]`, itinary[key]);
       }
-      if (members.length > 0) {
-        members.forEach((member) => {
+      if (participants.length > 0) {
+        participants.forEach((member) => {
           for (const key in member) {
+            console.log(key, member[key]);
             fd.append(`event[participants][][${key}]`, member[key]);
           }
         });
@@ -207,6 +231,7 @@ const DataTable = () => {
         if (!indexEdit) {
           // no index <=> POST to '/events'
           fetchAll({
+            // !!!!! no headers "Content-type".. for formdata !!!!!
             method: "POST",
             index: "",
             body: data,
@@ -269,9 +294,14 @@ const DataTable = () => {
           return kiters.push({
             email: selOpt.value,
             notif: participant.notif,
+            ptoken: "",
           });
         } else {
-          return kiters.push({ email: selOpt.value, notif: false });
+          return kiters.push({
+            email: selOpt.value,
+            notif: false,
+            ptoken: "",
+          });
         }
       });
       setParticipants(kiters);
@@ -320,7 +350,7 @@ const DataTable = () => {
         formdata.append(`event[participants][][${key}]`, member[key]);
       }
     });
-    fetchAll({ method: "PATCH", index: event.id, body: formdata, status: 200 });
+    fetchAll({ method: "PATCH", index: event.id, body: formdata });
   }
 
   // send mail to ask to join an event
@@ -341,9 +371,13 @@ const DataTable = () => {
       body: demand,
     });
     const response = await queryPushDemand.json();
+    console.log(response, response.status);
     if (response.status === 200) {
       window.alert("Mail sent");
+
       handleClose();
+    } else {
+      window.alert("Please login to access");
     }
   }
 
@@ -351,10 +385,8 @@ const DataTable = () => {
     <>
       {!events || !users ? (
         <Container>
-          <Row>
-            <Spinner animation="border" role="status">
-              <span className="sr-only">Waiting for data...</span>
-            </Spinner>
+          <Row className="justify-content-md-center">
+            <Spinner animation="border" role="status" />
           </Row>
         </Container>
       ) : (

@@ -39,7 +39,7 @@ class Api::V1::EventsController < ApplicationController
       end
       event.save
     end
-    return render json: { status: 201 }
+    return render json:  {events: Event.all}, status: 201
     
     # Active Storage: get the Cloudinary url if a photo is passed in the form
     #event.url = event.photo.url if event.photo.attached?    
@@ -63,8 +63,17 @@ class Api::V1::EventsController < ApplicationController
       # if a new picture is saved to Active Storage, update link
       # if a direct link to CL is done, the links will be in the params
       #event.update(url: event.photo.url) if event_params[:photo]
-      
-      return render json: { status: 200 }
+      if event.participants
+        event.participants.each do |participant|
+          # event.participant=[{email:xx,notif:xx},..] , 'jsonb' format => participant['email']
+          participant['notif'] = true
+          EventMailer.invitation(participant['email'], event.id)
+          .deliver_later
+        end
+        event.save
+      end
+
+      return render json: {events: Event.all}, status: 200
     else
       return render json: {errors: event.errors.full_messages},
         status: :unprocessable_entity
@@ -87,23 +96,47 @@ class Api::V1::EventsController < ApplicationController
 
     event.itinary.destroy
     event.destroy
-    return render json: {status: 200}
+    return render json: {events: Event.all}, status: 200
   end
 
   # send mail to owner of an event for user to join
   def receive_demand
-    itinary_id = params[:event][:itinary_id]
     owner = User.find_by(email: params[:owner])
-    render json: { status: :unprocessable_entity} if !owner
-    EventMailer.demand(current_user.email , owner.email, itinary_id )
+    return render json: { status: :unprocessable_entity} if !owner
+
+    itinary_id = params[:event][:itinary_id]
+    token = SecureRandom.urlsafe_base64.to_s
+    event = Event.find(params[:event][:id])
+    event.participants << {email: params[:user][:email], notif: false, ptoken: token}
+    event.save
+    EventMailer.demand(current_user.email , owner.email, itinary_id, token )
       .deliver_later
-    render json: { status: 200 } 
+    return render json: {events: Event.all},  status: 200
+  end
+
+  
+  # endpoint for mail from owner to accept user
+  def confirm_demand
+    events = Event.joins(:user).where("users.email LIKE ?", params[:name])
+    events.each do |event|
+      event.participants.each do |p|
+        logger.debug "........T1..#{p['email']} #{p['email'] == params[:user]}"
+        return if p['email'] == params[:user]
+        logger.debug ".......T2..#{p['ptoken']}...#{p['ptoken']== params[:ptoken]}"
+        if p['ptoken'] && p['ptoken']== params[:ptoken]
+          
+          p['notif']=true
+          event.save
+        end
+      end
+    end
+    return render json: {events: Event.all}, status: 201
   end
 
   private
     def event_params
       #logger.debug "................#{params.require(:event).fetch(:participants,[]).map(&:keys.to_sym).flatten.uniq}"
-      params.require(:event).permit( :user,  :directCLurl, :publicID,  itinary_attributes: [:date, :start, :end], participants: [:email, :notif, :id]) #photo for Active Storage
+      params.require(:event).permit( :user,  :directCLurl, :publicID,  itinary_attributes: [:date, :start, :end], participants: [:email, :notif, :id, :ptoken]) #photo for Active Storage
       #:participants => sp_keys)#, [:email, :id])
     end
     
@@ -112,5 +145,18 @@ class Api::V1::EventsController < ApplicationController
         render :unauthorized, status: 401
       end
     end
+
+    # def find_value_in_nested_hash(data, desired_value)
+    #   data.values.each do |value| 
+    #     case value
+    #     when desired_value
+    #       return data
+    #     when Hash
+    #       f = find_value_in_nested_hash(value, desired_value)
+    #       return f if f
+    #     end
+    #   end
+    #   nil
+    # end
     
 end

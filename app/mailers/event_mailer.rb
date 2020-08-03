@@ -7,9 +7,10 @@ class EventMailer < ApplicationMailer
     mail(to: @p_email,  subject: "Invitation to a downwind event")
   end
 
-  def demand(u_email, owner_email, itinary_id)
+  def demand(u_email, owner_email, itinary_id, token)
     @user = u_email
     @owner = owner_email
+    @token = token
     @itinary = Itinary.find(itinary_id)
     mail(to: @owner, subject: "Demand to join")
   end
