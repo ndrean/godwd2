@@ -3,6 +3,7 @@ class Api::V1::EventsController < ApplicationController
   before_action :authenticate_user, only: 
     [:create, :update, :destroy]
 
+  #e GET '/api/v1/events
   def index 
     render json:  
       Event.joins(:user, :itinary)
@@ -14,6 +15,7 @@ class Api::V1::EventsController < ApplicationController
       )
   end
 
+  # GET '/api/v1/events/:id'
   def show
     event = Event.find(params[:id])
     return render json: event.to_json(
@@ -24,7 +26,7 @@ class Api::V1::EventsController < ApplicationController
     )
   end
 
-  # POST
+  # POST '/api/v1/events'
   def create
     event = Event.new(event_params)
     event.user = current_user
@@ -32,7 +34,7 @@ class Api::V1::EventsController < ApplicationController
     
     if event.participants
       event.participants.each do |participant|
-        # event.participant=[{email:xx,notif:xx},..] , 'jsonb' format => participant['email']
+        # 'jsonb' format => participant['email'], not symbol :email
         participant['notif'] = true
         EventMailer.invitation(participant['email'], event.id)
         .deliver_later
@@ -45,7 +47,7 @@ class Api::V1::EventsController < ApplicationController
     #event.url = event.photo.url if event.photo.attached?    
   end
 
-  # PATCH/PUT /events/:id
+  #  PATCH 'api/v1/events/:id'
   def update
     event = Event.find(params[:id]) 
     # early return
@@ -65,7 +67,7 @@ class Api::V1::EventsController < ApplicationController
       #event.update(url: event.photo.url) if event_params[:photo]
       if event.participants
         event.participants.each do |participant|
-          # event.participant=[{email:xx,notif:xx},..] , 'jsonb' format => participant['email']
+          # 'jsonb' format => participant['email'], not :email
           participant['notif'] = true
           EventMailer.invitation(participant['email'], event.id)
           .deliver_later
@@ -80,7 +82,7 @@ class Api::V1::EventsController < ApplicationController
     end
   end
 
-  
+  # DELETE '/api/v1/events/:id'
   def destroy
     event = Event.find(params[:id])   
     return render json: { status: 401 } if event.user != current_user
@@ -99,6 +101,8 @@ class Api::V1::EventsController < ApplicationController
     return render json: {status: 200}
   end
 
+  
+  # POST '/api/v1/pushDemand'
   # send mail to owner of an event for user to join
   def receive_demand
     owner = User.find_by(email: params[:owner])
@@ -111,18 +115,19 @@ class Api::V1::EventsController < ApplicationController
     event.save
     EventMailer.demand(current_user.email , owner.email, itinary_id, token )
       .deliver_later
-    return render json: {status: 200}  if confirm_demand
+    return render status: 200  if confirm_demand
   end
 
   
-  # endpoint for mail from owner to accept user
+  # GET 'api/v1/confirmDemand/?name=XXX?user=YYY?ptoken=ZZZ'
+  # token sent from link in mail for owner to accept user
   def confirm_demand
     events = Event.joins(:user).where("users.email LIKE ?", params[:name])
     events.each do |event|
       event.participants.each do |p|
-        # logger.debug "........T1..#{p['email']} #{p['email'] == params[:user]}"
+        logger.debug "........T1..#{p['email']} #{p['email'] == params[:user]}"
         if p['ptoken'] && p['ptoken']== params[:ptoken]
-          # logger.debug ".......T2..#{p['ptoken']}...#{p['ptoken']== params[:ptoken]}"          
+          logger.debug ".......T2..#{p['ptoken']}...#{p['ptoken']== params[:ptoken]}"          
           p['notif']=true
           p['ptoken'] = ''
           event.save
@@ -141,7 +146,7 @@ class Api::V1::EventsController < ApplicationController
     
     def handle_unauthorized(current, user)
       unless current == user
-        render :unauthorized, status: 401
+        render json: {status: 401, errors: ['unauthorized']}
       end
     end
 

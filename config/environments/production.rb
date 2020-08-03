@@ -1,5 +1,7 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
+  config.active_job.queue_adapter = :sidekiq
+
   config.action_mailer.delivery_method = :mailgun
   config.action_mailer.delivery_method = :mailgun
   config.action_mailer.mailgun_settings = {

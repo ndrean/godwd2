@@ -7,26 +7,23 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faShare,
-  // faBell,
-  faSignInAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { faShare, faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 
-function Details({ event, onhandlePushNotif }) {
-  const [show, setShow] = React.useState(false);
-
+export default function Details(props) {
+  const { event, ...rest } = props;
   // console.log("render Details");
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
 
   return (
     <>
-      <Button variant="outline-primary" onClick={handleShow}>
+      <Button variant="outline-primary" onClick={rest.onhandleShowDetail}>
         <FontAwesomeIcon icon={faSignInAlt} size="2x" />
       </Button>
 
-      <Modal show={show} onHide={handleClose} animation={false}>
+      <Modal
+        show={rest.showDetail}
+        onHide={rest.onhandleCloseDetail}
+        animation={false}
+      >
         <Modal.Header closeButton>
           <Modal.Title>
             Date: {event.itinary.date} <br />
@@ -64,12 +61,12 @@ function Details({ event, onhandlePushNotif }) {
                     </Row>
                   </Container>
                 ))}
-          <Button variant="primary" onClick={onhandlePushNotif}>
+          <Button variant="primary" onClick={rest.onhandlePush}>
             <FontAwesomeIcon icon={faShare} /> Ask to participate
           </Button>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={props.onhandleCloseDetail}>
             Close
           </Button>
         </Modal.Footer>
@@ -77,5 +74,3 @@ function Details({ event, onhandlePushNotif }) {
     </>
   );
 }
-// export default Details;
-export default Details;

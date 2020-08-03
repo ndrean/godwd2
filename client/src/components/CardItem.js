@@ -7,15 +7,12 @@ import { Card, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignIn } from "@fortawesome/free-solid-svg-icons";
 
-import Details from "./Details";
-
-const CardItem = ({ event, ...props }) => {
+export default function CardItem({ event, ...props }) {
   return (
     <Container>
       <Row>
         <Col xs={12}>
           <Card border="primary">
-            {/* style={{ padding: "10px" }} */}
             <Card.Img
               variant="top"
               src={event.directCLurl || require("../assets/pointreyes.jpg")}
@@ -27,18 +24,17 @@ const CardItem = ({ event, ...props }) => {
             />
             <Card.ImgOverlay>
               <Card.Title>{event.itinary.date}</Card.Title>
+
               <Card.Text style={{ fontWeight: "bold", fontSize: "20px" }}>
                 Organizer: {event.user.email}
                 <br />
                 From: {event.itinary.start} <br />
                 To: {event.itinary.end} <br />
               </Card.Text>
+
               <Card.Footer>
-                <Details
-                  event={event}
-                  onhandleNotifChange={props.onhandleNotif}
-                  onhandlePushNotif={props.onhandlePush}
-                />
+                {props.children}
+
                 <Button
                   variant="outline-danger"
                   onClick={props.onhandleRemove}
@@ -46,6 +42,7 @@ const CardItem = ({ event, ...props }) => {
                 >
                   <FontAwesomeIcon icon="trash" size="2x" />
                 </Button>
+
                 <Button
                   variant="outline-dark"
                   onClick={props.onhandleEdit}
@@ -61,6 +58,4 @@ const CardItem = ({ event, ...props }) => {
       <br />
     </Container>
   );
-};
-
-export default CardItem;
+}

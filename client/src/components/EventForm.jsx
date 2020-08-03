@@ -13,21 +13,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import cloudName from "../config/cloudName";
 
-const AddEventForm = (props) => {
+const EventForm = (props) => {
   const {
     users,
     participants,
     date,
     start,
     end,
-    // previewAS,
     loading,
     previewCL,
     publicID,
     onFormSubmit,
     onhandleItinaryChange,
     onSelectChange,
-    // onhandlePhotoAS,
     onhandlePictureCL,
   } = props;
 
@@ -90,20 +88,6 @@ const AddEventForm = (props) => {
           />
         </Form.Group>
 
-        {/* <Form.Group>
-          <Form.Label>
-            <span>Join a ... </span>
-            <FontAwesomeIcon icon="camera" size="2x" />
-            <Form.File
-              type="file"
-              name="photo"
-              hidden
-              onChange={onhandlePhotoAS}
-              accept="image/*"
-            />
-          </Form.Label>
-        </Form.Group> */}
-
         <Form.Group>
           <Form.Label>
             <span>Join a ... </span>
@@ -137,21 +121,6 @@ const AddEventForm = (props) => {
 
       <br />
 
-      {/* <Row className="justify-content-md-center">
-        <Col xs={6} md="auto">
-          {previewAS && (
-            <Image
-              src={previewAS}
-              alt={"AS"}
-              // style={{ width: "250" }}
-              fluid
-              width="100"
-              loading="lazy"
-            />
-          )}
-        </Col>
-      </Row> */}
-
       <Row className="justify-content-md-center">
         <Col xs={6} md="auto">
           {publicID && (
@@ -182,4 +151,4 @@ const AddEventForm = (props) => {
   );
 };
 
-export default React.memo(AddEventForm);
+export default EventForm;

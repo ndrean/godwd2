@@ -2,8 +2,7 @@ import React from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 
-function AddEventModal(props) {
-  // console.log("render Modal");
+export default function EventModal(props) {
   return (
     <>
       <Modal show={props.show} onHide={props.onhandleClose}>
@@ -20,5 +19,3 @@ function AddEventModal(props) {
     </>
   );
 }
-
-export default React.memo(AddEventModal);

@@ -10,7 +10,7 @@ import facebookConfig from "../config/facebookConfig";
 
 const uri = process.env.REACT_APP_URL;
 
-export default function LoginForm() {
+export default function LoginForm(props) {
   console.log("render Login");
   const [showModal, setShowModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -18,9 +18,6 @@ export default function LoginForm() {
   const [loggedIn, setLoggedIn] = React.useState(false);
   const [initialTab, setInitialTab] = React.useState("login");
   const [avatar, setAvatar] = React.useState("");
-  // const [recoverPasswordSuccess, setRecoverPasswordSuccess] = React.useState(
-  //   null
-  // );
   const [result, setResult] = React.useState("");
 
   function openModal() {
@@ -57,30 +54,29 @@ export default function LoginForm() {
     }
   }
 
+  function saveUser(jwt, user) {
+    setLoggedIn(true);
+    localStorage.setItem("jwt", jwt);
+    localStorage.setItem("user", user.email);
+    alert(`Welcome ${user.email}`);
+  }
+
   async function onLoginSuccess(method, response) {
     setResult({ method, response });
     const { email, password } = response;
 
     if (method === "facebook") {
-      // let gAccessToken;
-      // if (localStorage.getItem("accessToken")) {
-      //   gAccessToken = localStorage.getItem("accessToken");
-      // } else {
       const {
         authResponse: { accessToken }, //, userID },
       } = response;
-      //   gAccessToken = accessToken;
-      //   localStorage.setItem("accessToken", accessToken);
-      // }
-      // call Facebook to get user credentials: window.FB.api(userID, (res) =>{ setResult(res.name )})
+      // call Facebook to get user's credentials: window.FB.api(userID, (res) =>{ setResult(res.name )})
       const query = await fetch(`https://graph.facebook.com/me?access_token=${accessToken}&
 fields=id,name,email,picture.width(640).height(640)`);
       const {
         id,
-        // name,
         email,
         picture: {
-          data: { url }, //, height, width },
+          data: { url },
         },
       } = await query.json();
       setAvatar(url);
@@ -90,6 +86,7 @@ fields=id,name,email,picture.width(640).height(640)`);
           uid: id,
         },
       };
+      // call API to find or create user and get Knock_token
       const queryAppToken = await fetch(uri + "/api/v1/findCreateFbUser", {
         method: "POST",
         body: JSON.stringify(fbUserData),
@@ -97,7 +94,6 @@ fields=id,name,email,picture.width(640).height(640)`);
       });
       if (queryAppToken.ok) {
         const { access_token } = await queryAppToken.json();
-
         try {
           const getCurrentUser = await fetch(uri + "/api/v1/profile", {
             headers: { authorization: "Bearer " + access_token },
@@ -105,11 +101,8 @@ fields=id,name,email,picture.width(640).height(640)`);
           const currentUser = await getCurrentUser.json();
 
           if (currentUser.confirm_email && !currentUser.confirm_token) {
-            setLoggedIn(true);
-            localStorage.setItem("jwt", access_token);
-            localStorage.setItem("user", currentUser.email);
-            alert(`Welcome ${currentUser.email}`);
-            setResult(currentUser);
+            saveUser(access_token, currentUser);
+            props.handleUser(currentUser);
           } else {
             onLoginFail("Check your mail to confirm password update");
           }
@@ -144,11 +137,8 @@ fields=id,name,email,picture.width(640).height(640)`);
           const currentUser = await getCurrentUser.json();
           if (currentUser.confirm_email && !currentUser.confirm_token) {
             console.log("__confirmed__");
-            setLoggedIn(true);
-            localStorage.setItem("jwt", jwt);
-            localStorage.setItem("user", currentUser.email);
-            alert(`Welcome ${currentUser.email}`);
-            setResult(currentUser);
+            saveUser(jwt, currentUser);
+            props.handleUser(currentUser);
           } else {
             onLoginFail("Check your mail to confirm password update 1");
           }
@@ -186,11 +176,8 @@ fields=id,name,email,picture.width(640).height(640)`);
 
                 if (currentUser.confirm_mail && !currentUser.confirm_token) {
                   console.log("__updated__");
-                  setLoggedIn(true);
-                  localStorage.setItem("jwt", jwt);
-                  localStorage.setItem("user", currentUser.email);
-                  setResult(currentUser);
-                  alert(`Welcome ${currentUser.email}`);
+                  saveUser(jwt, currentUser);
+                  props.handleUser(currentUser);
                 } else {
                   onLoginFail("Check your mail to confirm password update 2");
                 }
@@ -228,11 +215,7 @@ fields=id,name,email,picture.width(640).height(640)`);
           });
           const currentUser = await getCurrentUser.json();
           if (currentUser.confirm_email && !currentUser.confirm_token) {
-            setLoggedIn(true);
-            setResult(currentUser);
-            localStorage.setItem("jwt", jwt);
-            localStorage.setItem("user", response.email);
-            alert(`Welcome ${currentUser.email}`);
+            saveUser(jwt, currentUser);
           } else {
             onLoginFail("Please confirm with your email");
           }
@@ -245,7 +228,7 @@ fields=id,name,email,picture.width(640).height(640)`);
     }
     closeModal();
     setLoading(false);
-    //setInitialTab("login");
+    setInitialTab("login");
   }
 
   function onLoginFail(response) {
@@ -334,6 +317,7 @@ fields=id,name,email,picture.width(640).height(640)`);
           onCloseModal={closeModal}
           loading={loading}
           error={error}
+          initialTab={initialTab}
           //   tabs={{ afterChange: afterTabsChange }}
           loginError={{ label: "Couldn't sign in, please try again." }}
           registerError={{ label: "Couldn't sign up, please try again." }}

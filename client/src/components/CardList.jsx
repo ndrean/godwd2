@@ -1,55 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 
-import Table from "react-bootstrap/Table";
+// import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
-import Spinner from "react-bootstrap/Spinner";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
-// import TableRow from "./TableRow";
-import AddEventModal from "./AddEventModal";
-import AddEventForm from "./AddEventForm";
-import fetchWithToken from "../helpers/fetchWithToken";
-
 import CardItem from "./CardItem";
+import Details from "./Details";
 
-// utilitaries for fetch (Rails token with @rails/ujs)
-// import fetchWithToken from "../helpers/fetchWithToken"; // token for POST, PATCH, DELETE
+import BePatient from "./BePatient";
+import EventModal from "./EventModal";
+import EventForm from "./EventForm";
+import fetchWithToken from "../helpers/fetchWithToken";
 import fetchAll from "../helpers/fetchAll"; // returns data after PATCH or POST depending upon endpoint
 import returnUnauthorized from "../helpers/returnUnauthorized";
 import { eventsEndPoint, usersEndPoint } from "../helpers/endpoints"; // const endpoints
-import cloudName from "../config/cloudName";
+import cloudName from "../config/cloudName"; // for Cloudinary
 
 const uri = process.env.REACT_APP_URL;
 
-const DataTable = () => {
-  // from db: events= [event:{user, itinary, participants}]
-  const [users, setUsers] = React.useState([]); // fetch from db
-  const [events, setEvents] = React.useState([]); // fetch from db
+export default function CardList() {
+  const [users, setUsers] = useState([]);
+  const [events, setEvents] = useState([]); // [event:{user, itinary, participants, url, publicID}]
+  const [itinary, setItinary] = useState(""); // array [date, start, end, startGSP, endGPS]
+  const [fileCL, setFileCL] = useState("");
+  const [previewCL, setPreviewCL] = useState(""); // preview photo
+  const [publicID, setPublicID] = useState(""); // id for Cloudinary
+  const [changed, setChanged] = useState(false); // boolean if file selected
+  const [loading, setLoading] = useState(false);
+  const [participants, setParticipants] = useState([]); // array of users
+  const [indexEdit, setIndexEdit] = useState(null); // :id for PATCH
+  const [show, setShow] = useState(false); // modal
+  const [showDetail, setShowDetail] = useState(false);
 
-  const [itinary, setItinary] = React.useState({
-    date: "",
-    start: "",
-    end: "",
-  });
-  // const [fileAS, setFileAS] = React.useState("");
-  const [fileCL, setFileCL] = React.useState("");
-  const [previewCL, setPreviewCL] = React.useState(""); // test
-  // const [previewAS, setPreviewAS] = React.useState("");
-  const [publicID, setPublicID] = React.useState("");
-  const [changed, setChanged] = React.useState(false); // if file selected
-  const [loading, setLoading] = React.useState(false);
+  const handleCloseDetail = () => setShowDetail(false);
+  const handleShowDetail = () => setShowDetail(true);
 
-  const [participants, setParticipants] = React.useState([]);
-
-  // api/v1/events/{indexEdit} to set PATCH or POST if not exist
-  const [indexEdit, setIndexEdit] = React.useState(null);
-  // Modal opened/closed
-  const [show, setShow] = React.useState(false);
-  console.log("render table");
+  console.log("_render CardList_");
   const handleShow = () => {
     setShow(true);
   };
@@ -58,69 +48,46 @@ const DataTable = () => {
     setShow(false);
     setItinary({ date: "", start: "", end: "" });
     setParticipants([]);
-    // setPreviewAS("");
     setPreviewCL("");
     setPublicID("");
-    // setFileAS("");
     setIndexEdit("");
     setChanged(false);
   };
 
-  function bePatient(bool) {
-    if (bool) {
-      return (
-        <Spinner animation="border" role="status">
-          <span className="sr-only">Waiting for data...</span>
-        </Spinner>
-      );
-    } else {
-      return null;
-    }
-  }
-
-  function update() {
+  React.useEffect(() => {
     (async function fetchData() {
+      setLoading(true);
       try {
         const responseEvents = await fetch(eventsEndPoint);
-        const responseUsers = await fetch(usersEndPoint);
-        const dataEvents = await responseEvents.json();
-        const dataUsers = await responseUsers.json();
-        if (dataEvents && dataUsers) {
+        if (responseEvents.ok) {
+          const dataEvents = await responseEvents.json();
           setEvents(dataEvents);
+        }
+      } catch (err) {
+        setEvents(null);
+        throw new Error(err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  React.useEffect(() => {
+    (async function fetchData() {
+      setLoading(true);
+      try {
+        const responseUsers = await fetch(usersEndPoint);
+        if (responseUsers.ok) {
+          const dataUsers = await responseUsers.json();
           setUsers(dataUsers);
         }
       } catch (err) {
+        setUsers(null);
         throw new Error(err);
       } finally {
-        //setLoading(false);
-        bePatient(false);
+        setLoading(false);
       }
     })();
-  }
-
-  // upload db
-  React.useEffect(() => {
-    //setLoading(true);
-    bePatient(true);
-    update();
-    // (async function fetchData() {
-    //   try {
-    //     const responseEvents = await fetch(eventsEndPoint);
-    //     const responseUsers = await fetch(usersEndPoint);
-    //     const dataEvents = await responseEvents.json();
-    //     const dataUsers = await responseUsers.json();
-    //     if (dataEvents && dataUsers) {
-    //       setEvents(dataEvents);
-    //       setUsers(dataUsers);
-    //     }
-    //   } catch (err) {
-    //     throw new Error(err);
-    //   } finally {
-    //     //setLoading(false);
-    //     bePatient(false);
-    //   }
-    // })(); //.catch(() => console.log);
-    //fetchData().catch((err) => console.log(err));
   }, []);
 
   // remove row from table
@@ -135,8 +102,6 @@ const DataTable = () => {
             Accept: "application/json",
           },
         }); // then new updated rows
-
-        console.log(query.status);
         if (query.status !== 200) {
           return returnUnauthorized();
         }
@@ -165,19 +130,7 @@ const DataTable = () => {
   async function handleFormSubmit(e) {
     e.preventDefault();
 
-    // adding boolean  field for notified? to participant
-    // let members = [];
-    // if (participants) {
-    //   members = participants.map((participant) => {
-    //     // if (!participant.hasOwnProperty("email")) {
-    //     return { email: participant, ptoken: null, notif: true };
-    //     // } else {
-    //     //   return participant;
-    //     // }
-    //   });
-    // }
-    console.log(participants);
-    // first promise to append non async data to the FormData
+    // first promise to append non-async data to the FormData
     function init(fd) {
       for (const key in itinary) {
         console.log(key, itinary[key]);
@@ -193,9 +146,6 @@ const DataTable = () => {
       } else {
         fd.append(`event[participants][]`, []);
       }
-      // if (fileAS) {
-      //   fd.append("event[photo]", fileAS);
-      // }
       return Promise.resolve(fd);
     }
 
@@ -235,7 +185,6 @@ const DataTable = () => {
             method: "POST",
             index: "",
             body: data,
-            status: 201,
           })
             .then((result) => {
               if (result) {
@@ -249,7 +198,6 @@ const DataTable = () => {
             method: "PATCH",
             index: indexEdit,
             body: data,
-            status: 200,
           })
             .then((result) => {
               if (result) {
@@ -273,12 +221,6 @@ const DataTable = () => {
     });
     setParticipants(data.participants || []);
 
-    // if (event.url) {
-    //   setPreviewAS(event.url);
-    // }
-    // if (event.directCLUrl) {
-    //   setPreviewCL(event.directCLUrl);
-    // }
     if (event.publicID) {
       setPublicID(event.publicID);
     }
@@ -316,41 +258,12 @@ const DataTable = () => {
     });
   }
 
-  // get photoAS
-  // async function handlePhotoAS(e) {
-  //   if (e.target.files[0]) {
-  //     setPreviewAS(URL.createObjectURL(e.target.files[0]));
-  //     setFileAS(e.target.files[0]);
-  //   }
-  // }
-
   async function handlePictureCL(e) {
     if (e.target.files[0]) {
       setPreviewCL(URL.createObjectURL(e.target.files[0]));
       setChanged(true);
       setFileCL(e.target.files[0]);
     }
-  }
-
-  // update state & db on notification checkbox per event per participant
-  function handleNotif(e, event) {
-    event.participants[e.target.name].notif = e.target.checked;
-    // find & replace
-    const items = [...events];
-    const idx = items.findIndex((item) => item.id === event.id);
-    items[idx] = event;
-    setEvents(items);
-
-    const formdata = new FormData();
-    for (const key in event.itinary) {
-      formdata.append(`event[itinary_attributes][${key}]`, event.itinary[key]);
-    }
-    event.participants.forEach((member) => {
-      for (const key in member) {
-        formdata.append(`event[participants][][${key}]`, member[key]);
-      }
-    });
-    fetchAll({ method: "PATCH", index: event.id, body: formdata });
   }
 
   // send mail to ask to join an event
@@ -381,7 +294,7 @@ const DataTable = () => {
         setEvents(dataEvents);
         setUsers(dataUsers);
       }
-      handleClose();
+      handleCloseDetail();
     }
   }
 
@@ -390,13 +303,12 @@ const DataTable = () => {
       {!events || !users ? (
         <Container>
           <Row className="justify-content-md-center">
-            <Spinner animation="border" role="status" />
+            <BePatient go={loading} />
           </Row>
         </Container>
       ) : (
         <>
           <br />
-
           <Container>
             <Row style={{ justifyContent: "center" }}>
               <Button
@@ -407,27 +319,24 @@ const DataTable = () => {
                 <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span>
               </Button>
 
-              <AddEventModal show={show} onhandleClose={handleClose}>
-                <AddEventForm
+              <EventModal show={show} onhandleClose={handleClose}>
+                <EventForm
                   users={users}
                   participants={participants}
                   date={itinary.date}
                   start={itinary.start}
                   end={itinary.end}
-                  // previewAS={previewAS}
                   previewCL={previewCL}
                   publicID={publicID}
                   loading={loading}
                   onFormSubmit={handleFormSubmit}
                   onhandleItinaryChange={handleItinaryChange}
                   onSelectChange={handleSelectChange}
-                  // onhandlePhotoAS={handlePhotoAS}
                   onhandlePictureCL={handlePictureCL}
                 />
-              </AddEventModal>
+              </EventModal>
             </Row>
           </Container>
-
           <br />
 
           <Container>
@@ -439,44 +348,20 @@ const DataTable = () => {
                     event={event}
                     onhandleRemove={(e) => handleRemove(e, event)}
                     onhandleEdit={() => handleEdit(event)}
-                    onhandleNotif={(e) => handleNotif(e, event)}
-                    onhandlePush={() => handlePush(event)}
-                  />
+                  >
+                    <Details
+                      event={event}
+                      showDetail={showDetail}
+                      onhandlePush={() => handlePush(event)}
+                      onhandleCloseDetail={handleCloseDetail}
+                      onhandleShowDetail={handleShowDetail}
+                    />
+                  </CardItem>
                 );
               })}
           </Container>
-
-          {/* <br />
-          <Table bordered size="md" striped responsive="sm">
-            <thead>
-              <tr>
-                <th>Event Owner</th>
-                <th>Date</th>
-                <th>Starting</th>
-                <th>Notify</th>
-                <th colSpan={2}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {!events
-                ? null
-                : events.map((event) => (
-                    <TableRow
-                      key={event.id}
-                      event={event}
-                      //notify={notify}
-                      onhandleRemove={(e) => handleRemove(e, event)}
-                      onhandleEdit={() => handleEdit(event)}
-                      onhandleNotif={(e) => handleNotif(e, event)}
-                      onhandlePush={() => handlePush(event)}
-                    />
-                  ))}
-            </tbody>
-          </Table> */}
         </>
       )}
     </>
   );
-};
-
-export default DataTable;
+}

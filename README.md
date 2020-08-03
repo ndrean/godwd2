@@ -1,3 +1,7 @@
+# Puma
+
+In `puma.rb`, change port to 3001: `port ENV.fetch("PORT") { 3001 }`
+
 # Sidekiq
 
 In './config/application', declare `config.active_job.queue_adapter = :sidekiq`
@@ -59,6 +63,9 @@ lass User < ApplicationRecord
   end
 end
 ```
+
+and for email validation:
+`validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i`
 
 ## Model Itinary
 

@@ -27,6 +27,7 @@ class Api::V1::UsersController < ApplicationController
     render json: fb_user, status: 200
   end
 
+  # POST '/api/v1/CreateUser'
   def create_user
     return render json: { status: :not_acceptable }  if !user_params[:password]
     user = User.find_by(email: user_params[:email])
@@ -45,7 +46,8 @@ class Api::V1::UsersController < ApplicationController
     render json: { status: 401 }
   end
     
-  # endpoint of link via mail
+  # GET '/api/v1/ConfirmDemand'
+  # token sent via link via mail from user to confirm register
   def confirmed_email
     user = User.find_by(confirm_token: params[:mail_token])
     if user
@@ -58,17 +60,17 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def index
-    render json: User.all
+    render json: User.all.to_json
   end
 
-  # GET /users/1
+  # GET 'api/v1//users/:id'
   def show
     user = User.find(params[:id])
     render json: user
   end
 
 
-  # DELETE /users/1
+  # DELETE 'api/v1/users/:id'
   def destroy
     user = User.find(params[:id])
     if user == current_user

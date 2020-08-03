@@ -9,7 +9,7 @@ import FormControl from "react-bootstrap/FormControl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import GeolocProvider from "../geoloc/GeolocProvider";
-export default function MyNavBar() {
+export default function MyNavBar({ onhandleUser }) {
   return (
     <>
       <Navbar bg="primary" variant="dark">
@@ -23,7 +23,7 @@ export default function MyNavBar() {
         </Navbar.Brand>
         <Nav className="mr-auto">
           <Nav.Link href="#home">
-            <LoginForm />
+            <LoginForm handleUser={onhandleUser} />
           </Nav.Link>
         </Nav>
         <Nav.Link>
