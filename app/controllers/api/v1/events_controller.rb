@@ -1,7 +1,7 @@
 class Api::V1::EventsController < ApplicationController
   #skip_before_action :verify_authenticity_token
   before_action :authenticate_user, only: 
-    [:create, :update, :destroy]
+    [:create, :update, :destroy, :receive_demand ]
 
   #e GET '/api/v1/events
   def index 
@@ -124,19 +124,24 @@ class Api::V1::EventsController < ApplicationController
   # GET 'api/v1/confirmDemand/?name=XXX?user=YYY?ptoken=ZZZ'
   # token sent from link in mail for owner to accept user
   def confirm_demand
-    events = Event.joins(:user).where("users.email LIKE ?", params[:name])
+    owner = params[:name]
+    itinary = Itinary.find(params[:itinary])
+    events = Event.joins(:user).where("users.email LIKE ?", owner)
     events.each do |event|
       event.participants.each do |p|
-        logger.debug "........T1..#{p['email']} #{p['email'] == params[:user]}"
+        # logger.debug "........T1..#{p['email']} #{p['email'] == params[:user]}"
         if p['ptoken'] && p['ptoken']== params[:ptoken]
-          logger.debug ".......T2..#{p['ptoken']}...#{p['ptoken']== params[:ptoken]}"          
+          # logger.debug ".......T2..#{p['ptoken']}...#{p['ptoken']== params[:ptoken]}"          
           p['notif']=true
           p['ptoken'] = ''
           event.save
-          return true
+          
         end
       end
     end
+    user = params[:user]
+    UserMailer.accept(user, owner, itinary.id).deliver_later
+    return true
   end
 
   private

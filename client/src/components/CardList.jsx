@@ -4,12 +4,12 @@ import React, { useState } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
+// import Modal from "react-bootstrap/Modal";
+// import Col from "react-bootstrap/Col";
+// import Form from "react-bootstrap/Form";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faShare } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import CardItem from "./CardItem";
 import Details from "./Details";
@@ -36,17 +36,19 @@ export default function CardList({ user, users, events, ...props }) {
   const [participants, setParticipants] = useState([]); // array of users
   const [indexEdit, setIndexEdit] = useState(null); // :id for PATCH
   const [show, setShow] = useState(false); // modal
-  const [showDetail, setShowDetail] = useState(false);
   const [modalId, setModalId] = useState(null);
 
   console.log("_render CardList_");
 
+  // modal in a list: use index boolean
   const handleCloseDetail = () => setModalId(null);
+
   const handleShowDetail = (index) => {
     setModalId(index);
-    // setShowDetail(true);
   };
+
   const handleShow = () => setShow(true);
+
   const handleClose = () => {
     setShow(false);
     setItinary("");
@@ -160,7 +162,6 @@ export default function CardList({ user, users, events, ...props }) {
             .then((result) => {
               if (result) {
                 props.onhandleUpdateEvents(result);
-                // setnEvents(result);
               }
             })
             .catch((err) => console.log(err));
@@ -174,7 +175,6 @@ export default function CardList({ user, users, events, ...props }) {
             .then((result) => {
               if (result) {
                 props.onhandleUpdateEvents(result);
-                // setnEvents(result);
               }
             })
             .catch((err) => console.log(err));
@@ -316,14 +316,12 @@ export default function CardList({ user, users, events, ...props }) {
                 >
                   <Details
                     event={event}
-                    // showDetail={showDetail}
                     index={index}
                     modalId={modalId}
-                    onhandleCloseDetail={handleCloseDetail}
+                    // onhandleCloseDetail={handleCloseDetail}
                     onhandleShowDetail={() => handleShowDetail(index)}
                     onhandlePush={() => handlePush(event)}
                     onhandleCloseDetail={() => handleCloseDetail(index)}
-                    onhandleShowDetail={() => handleShowDetail(index)}
                   />
                 </CardItem>
               );

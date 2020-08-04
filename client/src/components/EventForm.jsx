@@ -9,7 +9,6 @@ import Image from "react-bootstrap/Image";
 import { Image as CLImage, CloudinaryContext } from "cloudinary-react";
 import Select from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faCamera, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 import cloudName from "../config/cloudName";
 

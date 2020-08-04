@@ -5,7 +5,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Image from "react-bootstrap/Image";
-import FormControl from "react-bootstrap/FormControl";
+// import FormControl from "react-bootstrap/FormControl";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import GeolocProvider from "../geoloc/GeolocProvider";

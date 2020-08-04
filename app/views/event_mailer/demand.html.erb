@@ -1,9 +1,13 @@
 <p>Hi <%= @owner %></p>
 
-
 <p>I am interested to joint the event you organise:</p>
 <p>Date: <%= @itinary.date%></p>
 <p>From: <%= @itinary.start%></p>
 <p>To: <%= @itinary.end%></p>
 
-<p>You can email me at: <%= mail_to @user%> or update with this = > <a href=<%="http://localhost:3001/api/v1/confirmDemand?name=#{@owner}&ptoken=#{@token}&user=#{@user}"%>>link</a> < = </p>
+<p>You can email me at: <%= mail_to @user%> or click on this = > 
+    <a href=<%="http://localhost:3001/api/v1/confirmDemand?name=#{@owner}&ptoken=#{@token}&user=#{@user}&itinary=#{@itinary.id}"%>>link</a> < = 
+which notifies me that you accepted my demand.</p>
+
+<p>Cheers</p>
+
