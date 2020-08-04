@@ -11,7 +11,7 @@ import facebookConfig from "../config/facebookConfig";
 const uri = process.env.REACT_APP_URL;
 
 export default function LoginForm({ user, ...props }) {
-  console.log("render Login");
+  console.log("__render Login__");
   const [showModal, setShowModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
@@ -60,7 +60,7 @@ export default function LoginForm({ user, ...props }) {
     localStorage.setItem("user", user.email);
     alert(`Welcome ${user.email}`);
     // take user up tp App
-    props.handleUser(user);
+    props.handleAddUser(user);
   }
 
   async function onLoginSuccess(method, response) {
@@ -339,24 +339,12 @@ fields=id,name,email,picture.width(640).height(640)`);
           form={{
             onLogin: onLogin,
             onRegister: onRegister,
-            // onRecoverPassword: onRecoverPassword,
-            // recoverPasswordSuccessLabel: recoverPasswordSuccess
-            //   ? {
-            //       label: "New password has been sent to your mailbox!",
-            //     }
-            //   : null,
-            // recoverPasswordAnchor: {
-            //   label: "Forgot your password?",
-            // },
             loginBtn: {
               label: "Sign in",
             },
             registerBtn: {
               label: "Sign up",
             },
-            // recoverPasswordBtn: {
-            //   label: "Send new password",
-            // },
             loginInputs: [
               {
                 containerClass: "RML-form-group",
@@ -378,15 +366,6 @@ fields=id,name,email,picture.width(640).height(640)`);
               },
             ],
             registerInputs: [
-              // {
-              //   containerClass: "RML-form-group",
-              //   label: "Nickname",
-              //   type: "text",
-              //   inputClass: "RML-form-control",
-              //   id: "login",
-              //   name: "login",
-              //   placeholder: "Nickname",
-              // },
               {
                 containerClass: "RML-form-group",
                 label: "Email",

@@ -49,45 +49,38 @@ export default function App() {
   }, []);
 
   // get currentUser in the child component App>MyNavBar>LoginForm and takes it up back here to update
-  function handleUser(currentUser) {
+  function handleAddUser(currentUser) {
     setUser(currentUser);
     if (!users.find((user) => user.email === currentUser.email)) {
       setUsers((prev) => [...prev, currentUser]);
     }
   }
 
-  async function getUsers() {
-    try {
-      const responseUsers = await fetch(usersEndPoint);
-      const dataUsers = await responseUsers.json();
-      if (dataUsers) {
-        setUsers(dataUsers);
-      }
-    } catch (err) {
-      throw new Error(err);
-    }
+  function handleRemoveEvent(event) {
+    console.log("*removeEvt*");
+    setEvents((prev) => [...prev].filter((ev) => ev.id !== event.id));
   }
 
-  async function getEvents() {
-    try {
-      const responseEvents = await fetch(eventsEndPoint);
-      const dataEvents = await responseEvents.json();
-      if (dataEvents) {
-        setEvents(dataEvents);
-      }
-    } catch (err) {
-      throw new Error(err);
-    }
+  function handleAddEvent(event) {
+    console.log("*AddEvt*", event);
+    setEvents((prev) => [...prev, event]);
+  }
+
+  function handleUpdateEvents(results) {
+    console.log("*updateEvts*");
+    setEvents(results);
   }
 
   return (
     <>
-      <MyNavBar user={user} onhandleUser={handleUser} />
+      <MyNavBar user={user} onhandleAddUser={handleAddUser} />
       <CardList
+        user={user}
         users={users}
         events={events}
-        ongetEvents={getEvents}
-        ongetUsers={getUsers}
+        onhandleRemoveEvent={handleRemoveEvent}
+        onhandleAddEvent={handleAddEvent}
+        onhandleUpdateEvents={handleUpdateEvents}
       />
     </>
   );

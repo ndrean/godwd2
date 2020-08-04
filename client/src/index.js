@@ -37,8 +37,6 @@ library.add(
 ReactDOM.render(
   <>
     <App />
-    {/* <MyNavBar />
-    <CardList /> */}
   </>,
   document.getElementById("root")
 );

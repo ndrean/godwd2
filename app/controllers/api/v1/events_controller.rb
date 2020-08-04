@@ -115,7 +115,9 @@ class Api::V1::EventsController < ApplicationController
     event.save
     EventMailer.demand(current_user.email , owner.email, itinary_id, token )
       .deliver_later
-    return render status: 200  if confirm_demand
+    
+      return render status: 200
+    
   end
 
   

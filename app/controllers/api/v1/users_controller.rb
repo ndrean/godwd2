@@ -33,12 +33,13 @@ class Api::V1::UsersController < ApplicationController
     user = User.find_by(email: user_params[:email])
     user.password = user_params[:password] if user
     user = User.create(user_params) if !user
+    # if the user has no 'confirm_token', set one and send a mail with it for him to click
     if user.confirm_token.blank? #&& !user.confirm_email
       user.confirm_token = SecureRandom.urlsafe_base64.to_s
-      user.save
+      user.save # save it in db for method 'confirmed_email to find him with the token
       UserMailer.register(user.email, user.confirm_token).deliver_later
     end
-    
+    # if the user has clicked on mail, the method 'confirmed_mail' has set confirm_mail=true and confirm_token=nil
     if user.confirm_email && user.confirm_token.blank?
       return render json: user, status: 200
     end

@@ -2,25 +2,28 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { Card, Button } from "react-bootstrap";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import Details from "./Details";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignIn } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEdit,
+  faTrash,
+  faSignInAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function CardItem({ event, ...props }) {
   return (
     <Container>
       <Row>
         <Col xs={12}>
-          <Card border="primary">
+          <Card border="primary" key={props.key}>
             <Card.Img
               variant="top"
               src={event.directCLurl || require("../assets/pointreyes.jpg")}
               alt="Card image"
-              // fluid="true"
               style={{ height: "250px", opacity: "0.6" }}
-
-              // thumbnail="true"
             />
             <Card.ImgOverlay>
               <Card.Title>{event.itinary.date}</Card.Title>
@@ -40,7 +43,7 @@ export default function CardItem({ event, ...props }) {
                   onClick={props.onhandleRemove}
                   style={{ fontSize: "15px", margin: "15px" }}
                 >
-                  <FontAwesomeIcon icon="trash" size="2x" />
+                  <FontAwesomeIcon icon={faTrash} size="2x" />
                 </Button>
 
                 <Button
@@ -48,7 +51,7 @@ export default function CardItem({ event, ...props }) {
                   onClick={props.onhandleEdit}
                   style={{ fontSize: "15px", margin: "10px" }}
                 >
-                  <FontAwesomeIcon icon="edit" size="2x" />
+                  <FontAwesomeIcon icon={faEdit} size="2x" />
                 </Button>
               </Card.Footer>
             </Card.ImgOverlay>

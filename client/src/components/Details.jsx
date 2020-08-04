@@ -1,4 +1,5 @@
 import React from "react";
+
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Container from "react-bootstrap/Container";
@@ -10,18 +11,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShare, faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 
 export default function Details(props) {
+  console.log("*details*");
   const { event, ...rest } = props;
-  // console.log("render Details");
 
   return (
     <>
-      <Button variant="outline-primary" onClick={rest.onhandleShowDetail}>
+      <Button variant="outline-primary" onClick={props.onhandleShowDetail}>
         <FontAwesomeIcon icon={faSignInAlt} size="2x" />
       </Button>
-
       <Modal
-        show={rest.showDetail}
-        onHide={rest.onhandleCloseDetail}
+        show={props.modalId === props.index}
+        onHide={props.onhandleCloseDetail}
         animation={false}
       >
         <Modal.Header closeButton>
@@ -61,7 +61,7 @@ export default function Details(props) {
                     </Row>
                   </Container>
                 ))}
-          <Button variant="primary" onClick={rest.onhandlePush}>
+          <Button variant="primary" onClick={props.onhandlePush}>
             <FontAwesomeIcon icon={faShare} /> Ask to participate
           </Button>
         </Modal.Body>

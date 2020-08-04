@@ -47,7 +47,7 @@ const EventForm = (props) => {
           <Form.Label>Date event</Form.Label>
           <Form.Control
             type="date"
-            value={date}
+            value={date || ""}
             name="date"
             required
             onChange={onhandleItinaryChange}
@@ -58,7 +58,7 @@ const EventForm = (props) => {
           <Form.Label>Start place</Form.Label>
           <Form.Control
             type="text"
-            value={start}
+            value={start || ""}
             required
             name="start"
             onChange={onhandleItinaryChange}
@@ -69,7 +69,7 @@ const EventForm = (props) => {
           <Form.Label>End place</Form.Label>
           <Form.Control
             type="text"
-            value={end}
+            value={end || ""}
             required
             name="end"
             onChange={onhandleItinaryChange}

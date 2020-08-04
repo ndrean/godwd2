@@ -4,9 +4,12 @@ import React, { useState } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faShare } from "@fortawesome/free-solid-svg-icons";
 
 import CardItem from "./CardItem";
 import Details from "./Details";
@@ -22,9 +25,8 @@ import cloudName from "../config/cloudName"; // for Cloudinary
 
 const uri = process.env.REACT_APP_URL;
 
-export default function CardList({ users, events, ...props }) {
-  const [nusers, setnUsers] = useState([]);
-  const [nevents, setnEvents] = useState([]); // [event:{user, itinary, participants, url, publicID}]
+export default function CardList({ user, users, events, ...props }) {
+  // events= [event:{user, itinary, participants, url, publicID}]
   const [itinary, setItinary] = useState(""); // array [date, start, end, startGSP, endGPS]
   const [fileCL, setFileCL] = useState("");
   const [previewCL, setPreviewCL] = useState(""); // preview photo
@@ -35,64 +37,32 @@ export default function CardList({ users, events, ...props }) {
   const [indexEdit, setIndexEdit] = useState(null); // :id for PATCH
   const [show, setShow] = useState(false); // modal
   const [showDetail, setShowDetail] = useState(false);
-
-  const handleCloseDetail = () => setShowDetail(false);
-  const handleShowDetail = () => setShowDetail(true);
+  const [modalId, setModalId] = useState(null);
 
   console.log("_render CardList_");
-  const handleShow = () => {
-    setShow(true);
-  };
 
+  const handleCloseDetail = () => setModalId(null);
+  const handleShowDetail = (index) => {
+    setModalId(index);
+    // setShowDetail(true);
+  };
+  const handleShow = () => setShow(true);
   const handleClose = () => {
     setShow(false);
-    setItinary({ date: "", start: "", end: "" });
+    setItinary("");
     setParticipants([]);
     setPreviewCL("");
     setPublicID("");
     setIndexEdit("");
     setChanged(false);
+    setModalId(null);
   };
-
-  // React.useEffect(() => {
-  //   (async function fetchData() {
-  //     setLoading(true);
-  //     try {
-  //       const responseEvents = await fetch(eventsEndPoint);
-  //       if (responseEvents.ok) {
-  //         const dataEvents = await responseEvents.json();
-  //         setnEvents(dataEvents);
-  //       }
-  //     } catch (err) {
-  //       setnEvents(null);
-  //       throw new Error(err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   })();
-  // }, []);
-
-  // React.useEffect(() => {
-  //   (async function fetchData() {
-  //     setLoading(true);
-  //     try {
-  //       const responseUsers = await fetch(usersEndPoint);
-  //       if (responseUsers.ok) {
-  //         const dataUsers = await responseUsers.json();
-  //         setnUsers(dataUsers);
-  //       }
-  //     } catch (err) {
-  //       setnUsers(null);
-  //       throw new Error(err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   })();
-  // }, []);
 
   // remove row from table
   const handleRemove = async (e, event) => {
     e.preventDefault();
+    if (!user) return window.alert("Please login");
+
     if (window.confirm("Confirm removal?")) {
       try {
         const query = await fetchWithToken(eventsEndPoint + event.id, {
@@ -110,7 +80,7 @@ export default function CardList({ users, events, ...props }) {
           if (response.status === 401) {
             return returnUnauthorized();
           }
-          setnEvents((prev) => [...prev].filter((ev) => ev.id !== event.id));
+          props.onhandleRemoveEvent(event);
         }
       } catch (err) {
         console.log(err);
@@ -129,8 +99,9 @@ export default function CardList({ users, events, ...props }) {
 
   async function handleFormSubmit(e) {
     e.preventDefault();
+    if (!user) return window.alert("Please login");
 
-    // first promise to append non-async data to the FormData
+    // 1st promise to append non-async data to the FormData
     function init(fd) {
       for (const key in itinary) {
         console.log(key, itinary[key]);
@@ -149,7 +120,7 @@ export default function CardList({ users, events, ...props }) {
       return Promise.resolve(fd);
     }
 
-    // second promise that Post photo to CL and receives link back and append FormData
+    // 2d promise: POST photo to CL, receives link back , and append FormData
     async function upLoadToCL(ffd) {
       if (changed) {
         // boolean: changed <=> new file input for CL
@@ -174,7 +145,7 @@ export default function CardList({ users, events, ...props }) {
         return Promise.resolve(ffd);
       }
     }
-    // chaining of promises
+    // chaining of promises 1 & 2
     init(new FormData())
       .then((res) => upLoadToCL(res))
       .then((data) => {
@@ -188,7 +159,8 @@ export default function CardList({ users, events, ...props }) {
           })
             .then((result) => {
               if (result) {
-                setnEvents(result);
+                props.onhandleUpdateEvents(result);
+                // setnEvents(result);
               }
             })
             .catch((err) => console.log(err));
@@ -201,7 +173,8 @@ export default function CardList({ users, events, ...props }) {
           })
             .then((result) => {
               if (result) {
-                setnEvents(result);
+                props.onhandleUpdateEvents(result);
+                // setnEvents(result);
               }
             })
             .catch((err) => console.log(err));
@@ -212,7 +185,7 @@ export default function CardList({ users, events, ...props }) {
 
   // Edit event
   async function handleEdit(event) {
-    setIndexEdit(event.id); // get /api/v1/events/ID
+    setIndexEdit(event.id); // get /api/v1/events/:id
     const data = events.find((ev) => ev.id === event.id);
     setItinary({
       date: new Date(data.itinary.date).toISOString().slice(0, 10),
@@ -268,40 +241,32 @@ export default function CardList({ users, events, ...props }) {
 
   // send mail to ask to join an event
   async function handlePush(event) {
-    const jwt = localStorage.getItem("jwt");
-    const getCurrentUser = await fetch(uri + "/api/v1/profile", {
-      headers: { authorization: "Bearer " + jwt },
-    });
-
-    const currentUser = await getCurrentUser.json();
-    const demand = JSON.stringify({
-      user: currentUser,
-      owner: event.user.email,
-      event: event,
-    });
-    const queryPushDemand = await fetchWithToken(uri + "/api/v1/pushDemand", {
-      method: "POST",
-      body: demand,
-    });
-    const response = await queryPushDemand.json();
-    window.alert("Mail sent");
-    handleCloseDetail();
-    // if (response) {
-    //   const responseEvents = await fetch(eventsEndPoint);
-    //   const responseUsers = await fetch(usersEndPoint);
-    //   const dataEvents = await responseEvents.json();
-    //   const dataUsers = await responseUsers.json();
-    //   if (dataEvents && dataUsers) {
-    //     setnEvents(dataEvents);
-    //     setnUsers(dataUsers);
-    //   }
-    //
-    // }
+    // const jwt = localStorage.getItem("jwt");
+    // const getCurrentUser = await fetch(uri + "/api/v1/profile", {
+    //   headers: { authorization: "Bearer " + jwt },
+    // });
+    // const currentUser = await getCurrentUser.json();
+    if (user) {
+      const demand = JSON.stringify({
+        user: user, //,currentUser,
+        owner: event.user.email,
+        event: event,
+      });
+      await fetchWithToken(uri + "/api/v1/pushDemand", {
+        method: "POST",
+        body: demand,
+      });
+      window.alert("Mail sent");
+      handleCloseDetail();
+    } else {
+      window.alert("Please login");
+      handleCloseDetail();
+    }
   }
 
   return (
     <>
-      {!nevents || !nusers ? (
+      {!events || !users ? (
         <Container>
           <Row className="justify-content-md-center">
             <BePatient go={loading} />
@@ -340,27 +305,29 @@ export default function CardList({ users, events, ...props }) {
           </Container>
           <br />
 
-          <Container>
-            {events &&
-              events.map((event) => {
-                return (
-                  <CardItem
-                    key={event.id}
+          {events &&
+            events.map((event, index) => {
+              return (
+                <CardItem
+                  key={event.id}
+                  event={event}
+                  onhandleRemove={(e) => handleRemove(e, event)}
+                  onhandleEdit={() => handleEdit(event)}
+                >
+                  <Details
                     event={event}
-                    onhandleRemove={(e) => handleRemove(e, event)}
-                    onhandleEdit={() => handleEdit(event)}
-                  >
-                    <Details
-                      event={event}
-                      showDetail={showDetail}
-                      onhandlePush={() => handlePush(event)}
-                      onhandleCloseDetail={handleCloseDetail}
-                      onhandleShowDetail={handleShowDetail}
-                    />
-                  </CardItem>
-                );
-              })}
-          </Container>
+                    // showDetail={showDetail}
+                    index={index}
+                    modalId={modalId}
+                    onhandleCloseDetail={handleCloseDetail}
+                    onhandleShowDetail={() => handleShowDetail(index)}
+                    onhandlePush={() => handlePush(event)}
+                    onhandleCloseDetail={() => handleCloseDetail(index)}
+                    onhandleShowDetail={() => handleShowDetail(index)}
+                  />
+                </CardItem>
+              );
+            })}
         </>
       )}
     </>
