@@ -1,3 +1,18 @@
+# Redis
+
+```
+# /config.redis.yml
+development:
+  host: ‘localhost’
+  port: ‘6379’
+test:
+  host: ‘localhost’
+  port: ‘6379’
+production:
+  host: ‘your-name.iz6wli.0001.use1.cache.amazonaws.com’
+  port: ‘6379’
+```
+
 # Puma
 
 In `puma.rb`, change port to 3001: `port ENV.fetch("PORT") { 3001 }`

@@ -150,4 +150,4 @@ const EventForm = (props) => {
   );
 };
 
-export default EventForm;
+export default React.memo(EventForm);

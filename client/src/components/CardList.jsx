@@ -25,7 +25,7 @@ import cloudName from "../config/cloudName"; // for Cloudinary
 
 const uri = process.env.REACT_APP_URL;
 
-export default function CardList({ user, users, events, ...props }) {
+function CardList({ user, users, events, ...props }) {
   // events= [event:{user, itinary, participants, url, publicID}]
   const [itinary, setItinary] = useState(""); // array [date, start, end, startGSP, endGPS]
   const [fileCL, setFileCL] = useState("");
@@ -241,11 +241,6 @@ export default function CardList({ user, users, events, ...props }) {
 
   // send mail to ask to join an event
   async function handlePush(event) {
-    // const jwt = localStorage.getItem("jwt");
-    // const getCurrentUser = await fetch(uri + "/api/v1/profile", {
-    //   headers: { authorization: "Bearer " + jwt },
-    // });
-    // const currentUser = await getCurrentUser.json();
     if (user) {
       const demand = JSON.stringify({
         user: user, //,currentUser,
@@ -257,11 +252,35 @@ export default function CardList({ user, users, events, ...props }) {
         body: demand,
       });
       window.alert("Mail sent");
+      const responseEvents = await fetch(eventsEndPoint);
+      if (responseEvents.ok) {
+        console.log("ici");
+        const dataEvents = await responseEvents.json();
+        props.onhandleUpdateEvents(dataEvents);
+      }
       handleCloseDetail();
     } else {
       window.alert("Please login");
       handleCloseDetail();
     }
+  }
+
+  function checkUserDemand(e, index, modalId, event) {
+    if (index !== modalId) return null;
+    console.log("*check*");
+    if (user) {
+      if (user.email === event.user.email) {
+        console.log("no");
+        return true;
+      }
+      const checkDemander = event.participants.find(
+        (participant) => participant.email === user.email
+      );
+      if (checkDemander) {
+        return true;
+      }
+    }
+    return false;
   }
 
   return (
@@ -318,10 +337,12 @@ export default function CardList({ user, users, events, ...props }) {
                     event={event}
                     index={index}
                     modalId={modalId}
-                    // onhandleCloseDetail={handleCloseDetail}
                     onhandleShowDetail={() => handleShowDetail(index)}
                     onhandlePush={() => handlePush(event)}
                     onhandleCloseDetail={() => handleCloseDetail(index)}
+                    onCheckUserDemand={(e) =>
+                      checkUserDemand(e, index, modalId, event)
+                    }
                   />
                 </CardItem>
               );
@@ -331,3 +352,5 @@ export default function CardList({ user, users, events, ...props }) {
     </>
   );
 }
+
+export default React.memo(CardList);

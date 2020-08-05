@@ -9,7 +9,8 @@ import Image from "react-bootstrap/Image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import GeolocProvider from "../geoloc/GeolocProvider";
-export default function MyNavBar({ user, onhandleAddUser, ...props }) {
+
+function MyNavBar({ user, onhandleAddUser, ...props }) {
   return (
     <>
       <Navbar bg="primary" variant="dark">
@@ -23,19 +24,25 @@ export default function MyNavBar({ user, onhandleAddUser, ...props }) {
         </Navbar.Brand>
         <Nav className="mr-auto">
           <Nav.Link href="#home">
-            <LoginForm user={user} handleAddUser={onhandleAddUser} />
+            <LoginForm
+              user={user}
+              handleAddUser={onhandleAddUser}
+              onhandleUpdateEvents={props.onhandleUpdateEvents}
+            />
           </Nav.Link>
         </Nav>
         <Nav.Link>
           <GeolocProvider />
         </Nav.Link>
-        <Form inline>
-          {/* <FormControl type="text" placeholder="Search" className="mr-sm-2" /> */}
+        <Nav.Link href="#search">
           <Button variant="outline-light" type="submit">
             <FontAwesomeIcon icon="globe-americas" size="2x" />
           </Button>
-        </Form>
+        </Nav.Link>
+        <Form inline></Form>
       </Navbar>
     </>
   );
 }
+
+export default React.memo(MyNavBar);

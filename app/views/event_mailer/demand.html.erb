@@ -6,7 +6,7 @@
 <p>To: <%= @itinary.end%></p>
 
 <p>You can email me at: <%= mail_to @user%> or click on this = > 
-    <a href=<%="http://localhost:3001/api/v1/confirmDemand?name=#{@owner}&ptoken=#{@token}&user=#{@user}&itinary=#{@itinary.id}"%>>link</a> < = 
+    <a href=<%="#{ENV['DOMAIN_HOST']}/api/v1/confirmDemand?name=#{@owner}&ptoken=#{@token}&user=#{@user}&itinary=#{@itinary.id}"%>>link</a> < = 
 which notifies me that you accepted my demand.</p>
 
 <p>Cheers</p>

@@ -62,7 +62,7 @@ export default function App() {
   }
 
   function handleAddEvent(event) {
-    console.log("*AddEvt*", event);
+    console.log("*AddEvt*");
     setEvents((prev) => [...prev, event]);
   }
 
@@ -73,7 +73,11 @@ export default function App() {
 
   return (
     <>
-      <MyNavBar user={user} onhandleAddUser={handleAddUser} />
+      <MyNavBar
+        user={user}
+        onhandleAddUser={handleAddUser}
+        onhandleUpdateEvents={handleUpdateEvents}
+      />
       <CardList
         user={user}
         users={users}

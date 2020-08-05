@@ -10,7 +10,7 @@ import facebookConfig from "../config/facebookConfig";
 
 const uri = process.env.REACT_APP_URL;
 
-export default function LoginForm({ user, ...props }) {
+function LoginForm({ user, ...props }) {
   console.log("__render Login__");
   const [showModal, setShowModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -54,13 +54,15 @@ export default function LoginForm({ user, ...props }) {
     }
   }
 
-  function saveUser(jwt, user) {
+  async function saveUser(jwt, user) {
     setLoggedIn(true);
     localStorage.setItem("jwt", jwt);
     localStorage.setItem("user", user.email);
     alert(`Welcome ${user.email}`);
     // take user up tp App
     props.handleAddUser(user);
+    const queryRefresh = await fetch(uri + "/api/v1/events");
+    props.onhandleUpdateEvents(await queryRefresh.json());
   }
 
   async function onLoginSuccess(method, response) {
@@ -104,8 +106,6 @@ fields=id,name,email,picture.width(640).height(640)`);
 
           if (currentUser.confirm_email && !currentUser.confirm_token) {
             saveUser(access_token, currentUser);
-            // user = currentUser;
-            // props.handleUser(currentUser);
           } else {
             onLoginFail("Check your mail to confirm password update");
           }
@@ -141,8 +141,6 @@ fields=id,name,email,picture.width(640).height(640)`);
           if (currentUser.confirm_email && !currentUser.confirm_token) {
             console.log("__confirmed__");
             saveUser(jwt, currentUser);
-            // user = currentUser;
-            // props.handleUser(currentUser);
           } else {
             onLoginFail("Check your mail to confirm password update 1");
           }
@@ -181,8 +179,6 @@ fields=id,name,email,picture.width(640).height(640)`);
                 if (currentUser.confirm_mail && !currentUser.confirm_token) {
                   console.log("__updated__");
                   saveUser(jwt, currentUser);
-                  // user = currentUser;
-                  // props.handleUser(currentUser);
                 } else {
                   onLoginFail("Check your mail to confirm password update 2");
                 }
@@ -299,19 +295,16 @@ fields=id,name,email,picture.width(640).height(640)`);
             }}
           >
             {" "}
-            {!avatar && result.email ? (
-              result.email
-            ) : avatar ? (
+            {!avatar && !result ? null : avatar ? (
               <Image
                 alt="avatar"
                 src={avatar}
                 style={{ width: 50, height: 50 }}
                 loading="lazy"
-                // roundedCircle
               />
-            ) : (
-              "Logout"
-            )}
+            ) : result.response ? (
+              result.response.email
+            ) : null}
           </Button>
         ) : null}
       </Container>
@@ -323,7 +316,6 @@ fields=id,name,email,picture.width(640).height(640)`);
           loading={loading}
           error={error}
           initialTab={initialTab}
-          //   tabs={{ afterChange: afterTabsChange }}
           loginError={{ label: "Couldn't sign in, please try again." }}
           registerError={{ label: "Couldn't sign up, please try again." }}
           startLoading={startLoading}
@@ -385,20 +377,23 @@ fields=id,name,email,picture.width(640).height(640)`);
                 placeholder: "Password",
               },
             ],
-            recoverPasswordInputs: [
-              {
-                containerClass: "RML-form-group",
-                label: "Email",
-                type: "email",
-                inputClass: "RML-form-control",
-                id: "email",
-                name: "email",
-                placeholder: "Email",
-              },
-            ],
+            // recoverPasswordInputs: [
+            //   {
+            //     containerClass: "RML-form-group",
+            //     label: "Email",
+            //     type: "email",
+            //     inputClass: "RML-form-control",
+            //     id: "email",
+            //     name: "email",
+            //     placeholder: "Email",
+            //   },
+            // ],
           }}
         />
       </Container>
     </>
   );
 }
+
+export default LoginForm;
+// export default React.memo(LoginForm);

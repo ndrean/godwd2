@@ -10,7 +10,7 @@ import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShare, faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 
-export default function Details(props) {
+function Details(props) {
   console.log("*details*");
   const { event, ...rest } = props;
 
@@ -38,30 +38,32 @@ export default function Details(props) {
               (go to 'edit' to invit buddies)
             </span>
           </p>
+          {/* .filter((participant) => participant.notif === true) */}
           {!event.participants
             ? null
-            : event.participants
-                .filter((participant) => participant.notif === true)
-                .map((participant, idx) => (
-                  <Container key={idx}>
-                    <Row key={participant.id}>
-                      <Col xs="6">{participant.email}</Col>
-                      <Col xs="3">
-                        <Form.Group controlId="formBasicCheckbox">
-                          <Form.Check
-                            name={idx}
-                            type="checkbox"
-                            label="Notified"
-                            readOnly
-                            checked={JSON.parse(participant.notif)}
-                            // onChange={onhandleNotifChange}
-                          />
-                        </Form.Group>
-                      </Col>
-                    </Row>
-                  </Container>
-                ))}
-          <Button variant="primary" onClick={props.onhandlePush}>
+            : event.participants.map((participant, idx) => (
+                <Container key={idx}>
+                  <Row key={participant.id}>
+                    <Col xs="6">{participant.email}</Col>
+                    <Col xs="3">
+                      <Form.Group controlId="formBasicCheckbox">
+                        <Form.Check
+                          name={idx}
+                          type="checkbox"
+                          label="Notified"
+                          readOnly
+                          checked={JSON.parse(participant.notif)}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </Container>
+              ))}
+          <Button
+            variant="primary"
+            onClick={props.onhandlePush}
+            disabled={props.onCheckUserDemand()}
+          >
             <FontAwesomeIcon icon={faShare} /> Ask to participate
           </Button>
         </Modal.Body>
@@ -74,3 +76,5 @@ export default function Details(props) {
     </>
   );
 }
+
+export default React.memo(Details);

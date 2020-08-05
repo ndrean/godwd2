@@ -1,10 +1,9 @@
-import React, { useContext } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./components/App";
-// import MyNavBar from "./components/MyNavBar";
-// import CardList from "./components/CardList";
+
 import * as serviceWorker from "./serviceWorker";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
