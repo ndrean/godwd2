@@ -5,13 +5,13 @@ class Api::V1::EventsController < ApplicationController
 
   #e GET '/api/v1/events
   def index 
+    upcoming_itinaries = Itinary.where('date >?', Date.today-1)
     render json:  
-      Event.joins(:user, :itinary)
-      .where('itinaries.date > ?', Date.today-1)
-      .to_json( include: [
-        user: {only: [:email]},
-        itinary: {only: [:date, :start, :end]}
-        ]
+      Event.includes(:user, :itinary).where(itinary: [upcoming_itinaries])
+      .to_json( include: [ 
+          user: {only: [:email]},
+          itinary: {only: [:date, :start, :end]}
+          ]
       )
   end
 

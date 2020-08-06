@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 
-// import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
-// import Modal from "react-bootstrap/Modal";
-// import Col from "react-bootstrap/Col";
-// import Form from "react-bootstrap/Form";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
@@ -254,7 +250,6 @@ function CardList({ user, users, events, ...props }) {
       window.alert("Mail sent");
       const responseEvents = await fetch(eventsEndPoint);
       if (responseEvents.ok) {
-        console.log("ici");
         const dataEvents = await responseEvents.json();
         props.onhandleUpdateEvents(dataEvents);
       }
@@ -265,18 +260,19 @@ function CardList({ user, users, events, ...props }) {
     }
   }
 
-  function checkUserDemand(e, index, modalId, event) {
+  function checkUserDemand(index, modalId, event) {
     if (index !== modalId) return null;
     console.log("*check*");
     if (user) {
       if (user.email === event.user.email) {
-        console.log("no");
+        window.alert("You are asking to yourself...! ;)");
         return true;
       }
       const checkDemander = event.participants.find(
         (participant) => participant.email === user.email
       );
       if (checkDemander) {
+        window.alert("Already done!");
         return true;
       }
     }
@@ -301,7 +297,8 @@ function CardList({ user, users, events, ...props }) {
                 onClick={handleShow}
                 style={{ fontSize: "30px" }}
               >
-                <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span>
+                <FontAwesomeIcon icon="fa-check" />{" "}
+                <span> Create an event</span>
               </Button>
 
               <EventModal show={show} onhandleClose={handleClose}>
@@ -340,8 +337,8 @@ function CardList({ user, users, events, ...props }) {
                     onhandleShowDetail={() => handleShowDetail(index)}
                     onhandlePush={() => handlePush(event)}
                     onhandleCloseDetail={() => handleCloseDetail(index)}
-                    onCheckUserDemand={(e) =>
-                      checkUserDemand(e, index, modalId, event)
+                    onCheckUserDemand={() =>
+                      checkUserDemand(index, modalId, event)
                     }
                   />
                 </CardItem>

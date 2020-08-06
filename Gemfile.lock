@@ -71,6 +71,9 @@ GEM
     bootsnap (1.4.7)
       msgpack (~> 1.0)
     builder (3.2.4)
+    bullet (6.1.0)
+      activesupport (>= 3.0.0)
+      uniform_notifier (~> 1.11)
     byebug (11.1.3)
     cloudinary (1.16.1)
       aws_cf_signer
@@ -88,6 +91,7 @@ GEM
     ffi (1.13.1)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
+    hodel_3000_compliant_logger (0.1.1)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     i18n (1.8.5)
@@ -107,6 +111,8 @@ GEM
     loofah (2.6.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
+    macaddr (1.7.2)
+      systemu (~> 2.6.5)
     mail (2.7.1)
       mini_mime (>= 0.1.1)
     mailgun-ruby (1.2.0)
@@ -126,6 +132,9 @@ GEM
     nio4r (2.5.2)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
+    oink (0.10.1)
+      activerecord
+      hodel_3000_compliant_logger
     pg (1.2.3)
     public_suffix (4.0.5)
     puma (4.3.5)
@@ -170,6 +179,8 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
+    ruby-growl (4.1)
+      uuid (~> 2.3, >= 2.3.5)
     sidekiq (6.1.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
@@ -187,6 +198,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
+    systemu (2.6.5)
     thor (1.0.1)
     thread_safe (0.3.6)
     tzinfo (1.2.7)
@@ -194,6 +206,9 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
+    uniform_notifier (1.13.0)
+    uuid (2.3.9)
+      macaddr (~> 1.0)
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -205,6 +220,7 @@ PLATFORMS
 DEPENDENCIES
   bcrypt (~> 3.1.7)
   bootsnap (>= 1.4.2)
+  bullet
   byebug
   cloudinary
   dotenv-rails
@@ -214,11 +230,13 @@ DEPENDENCIES
   letter_opener
   listen (~> 3.2)
   mailgun-ruby
+  oink
   pg (>= 0.18, < 2.0)
   puma (~> 4.1)
   rack-cors
   rails (~> 6.0.3, >= 6.0.3.2)
   redis (~> 4.0)
+  ruby-growl
   sidekiq
   sidekiq-failures (~> 1.0)
   spring
