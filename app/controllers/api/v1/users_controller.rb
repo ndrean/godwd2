@@ -41,7 +41,7 @@ class Api::V1::UsersController < ApplicationController
     end
     # if the user has clicked on mail, the method 'confirmed_mail' has set confirm_mail=true and confirm_token=nil
     if user.confirm_email && user.confirm_token.blank?
-      return render json: user, status: 200
+      return render json: user, status: 201
     end
 
     render json: { status: 401 }

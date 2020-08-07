@@ -35,15 +35,15 @@ function Details(props) {
           <p>
             Participants{" "}
             <span style={{ fontSize: "12px" }}>
-              (go to 'edit' to invit buddies)
+              (go to 'edit' to invite buddies)
             </span>
           </p>
           {/* .filter((participant) => participant.notif === true) */}
           {!event.participants
             ? null
             : event.participants.map((participant, idx) => (
-                <Container key={idx}>
-                  <Row key={participant.id}>
+                <Container key={participant.email.toString()}>
+                  <Row>
                     <Col xs="6">{participant.email}</Col>
                     <Col xs="3">
                       <Form.Group controlId="formBasicCheckbox">

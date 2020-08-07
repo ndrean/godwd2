@@ -1,8 +1,6 @@
 import React from "react";
 import ReactModalLogin from "react-modal-login";
 
-import Container from "react-bootstrap/Container";
-
 import Image from "react-bootstrap/Image";
 import Button from "react-bootstrap/Button";
 
@@ -68,12 +66,12 @@ function LoginForm({ user, ...props }) {
   async function onLoginSuccess(method, response) {
     setResult({ method, response });
     const { email, password } = response;
-
+    // 1. using Facebook log-in or sign-in
     if (method === "facebook") {
+      // 1.1 call Facebook to get user's credentials: window.FB.api(userID, (res) =>{ setResult(res.name )})
       const {
         authResponse: { accessToken }, //, userID },
       } = response;
-      // call Facebook to get user's credentials: window.FB.api(userID, (res) =>{ setResult(res.name )})
       const query = await fetch(`https://graph.facebook.com/me?access_token=${accessToken}&
 fields=id,name,email,picture.width(640).height(640)`);
       const {
@@ -84,13 +82,14 @@ fields=id,name,email,picture.width(640).height(640)`);
         },
       } = await query.json();
       setAvatar(url);
+
+      // 1.2 call API to FIND OR CREATE user and get API authentification Knock_token
       const fbUserData = {
         user: {
           email,
           uid: id,
         },
       };
-      // call API to find or create user and get Knock_token
       const queryAppToken = await fetch(uri + "/api/v1/findCreateFbUser", {
         method: "POST",
         body: JSON.stringify(fbUserData),
@@ -98,11 +97,13 @@ fields=id,name,email,picture.width(640).height(640)`);
       });
       if (queryAppToken.ok) {
         const { access_token } = await queryAppToken.json();
+        console.log(access_token);
         try {
           const getCurrentUser = await fetch(uri + "/api/v1/profile", {
             headers: { authorization: "Bearer " + access_token },
           });
           const currentUser = await getCurrentUser.json();
+          console.log(currentUser);
 
           if (currentUser.confirm_email && !currentUser.confirm_token) {
             saveUser(access_token, currentUser);
@@ -116,11 +117,11 @@ fields=id,name,email,picture.width(640).height(640)`);
         onLoginFail("Please confirm with your email");
       }
     }
-
+    // 2. using the form
     const authData = JSON.stringify({
       auth: { email, password },
     });
-
+    // 2.1 form sign-up
     if (method === "formUp") {
       // 1- check if user already exists with these credentials
       try {
@@ -196,7 +197,7 @@ fields=id,name,email,picture.width(640).height(640)`);
         throw new Error(err);
       }
     }
-
+    // 2.2 form sign-in
     if (method === "formIn") {
       // check user with the jwt token return from the backend
       try {
@@ -252,145 +253,134 @@ fields=id,name,email,picture.width(640).height(640)`);
     setLoading(false);
   }
 
-  // function afterTabsChange() {
-  //   setError(null);
-  //   setRecoverPasswordSuccess(false);
-  // }
-
   return (
     <>
-      <Container>
+      <Button
+        onClick={openModal}
+        hidden={loggedIn}
+        style={{
+          padding: "10px",
+          margin: "auto",
+          border: "none",
+          backgroundColor: "#1666C5", //"#3b5998",
+          color: "white",
+          fontWeight: "bold",
+          fontSize: "20px",
+        }}
+      >
+        Connect
+      </Button>
+
+      {!!localStorage.jwt ? (
         <Button
-          onClick={openModal}
-          hidden={loggedIn}
+          onClick={() => {
+            setLoggedIn(false);
+            localStorage.removeItem("jwt");
+            localStorage.removeItem("user");
+            setAvatar("");
+            setResult("");
+          }}
           style={{
-            padding: "10px",
+            padding: "5px",
             margin: "auto",
             border: "none",
-            backgroundColor: "#1666C5", //"#3b5998",
+            backgroundColor: "grey", //"#3b5998",
             color: "white",
-            fontWeight: "bold",
-            fontSize: "20px",
           }}
         >
-          Connect
+          {!avatar && !result ? null : avatar ? (
+            <Image
+              alt="avatar"
+              src={avatar}
+              style={{ width: 50, height: 50 }}
+              loading="lazy"
+            />
+          ) : result.response ? (
+            result.response.email
+          ) : null}
         </Button>
-      </Container>
-      <Container>
-        {!!localStorage.jwt ? (
-          <Button
-            onClick={() => {
-              setLoggedIn(false);
-              localStorage.removeItem("jwt");
-              localStorage.removeItem("user");
-              setAvatar("");
-              setResult("");
-            }}
-            style={{
-              padding: "5px",
-              margin: "auto",
-              border: "none",
-              backgroundColor: "grey", //"#3b5998",
-              color: "white",
-            }}
-          >
-            {" "}
-            {!avatar && !result ? null : avatar ? (
-              <Image
-                alt="avatar"
-                src={avatar}
-                style={{ width: 50, height: 50 }}
-                loading="lazy"
-              />
-            ) : result.response ? (
-              result.response.email
-            ) : null}
-          </Button>
-        ) : null}
-      </Container>
+      ) : null}
 
-      <Container>
-        <ReactModalLogin
-          visible={showModal}
-          onCloseModal={closeModal}
-          loading={loading}
-          error={error}
-          initialTab={initialTab}
-          loginError={{ label: "Couldn't sign in, please try again." }}
-          registerError={{ label: "Couldn't sign up, please try again." }}
-          startLoading={startLoading}
-          finishLoading={finishLoading}
-          providers={{
-            facebook: {
-              config: facebookConfig,
-              onLoginSuccess: onLoginSuccess,
-              onLoginFail: onLoginFail,
-              label: "Continue with Facebook",
+      <ReactModalLogin
+        visible={showModal}
+        onCloseModal={closeModal}
+        loading={loading}
+        error={error}
+        initialTab={initialTab}
+        loginError={{ label: "Couldn't sign in, please try again." }}
+        registerError={{ label: "Couldn't sign up, please try again." }}
+        startLoading={startLoading}
+        finishLoading={finishLoading}
+        providers={{
+          facebook: {
+            config: facebookConfig,
+            onLoginSuccess: onLoginSuccess,
+            onLoginFail: onLoginFail,
+            label: "Continue with Facebook",
+          },
+        }}
+        form={{
+          onLogin: onLogin,
+          onRegister: onRegister,
+          loginBtn: {
+            label: "Sign in",
+          },
+          registerBtn: {
+            label: "Sign up",
+          },
+          loginInputs: [
+            {
+              containerClass: "RML-form-group",
+              label: "Email",
+              type: "email",
+              inputClass: "RML-form-control",
+              id: "email",
+              name: "email",
+              placeholder: "Email",
             },
-          }}
-          form={{
-            onLogin: onLogin,
-            onRegister: onRegister,
-            loginBtn: {
-              label: "Sign in",
+            {
+              containerClass: "RML-form-group",
+              label: "Password",
+              type: "password",
+              inputClass: "RML-form-control",
+              id: "password",
+              name: "password",
+              placeholder: "Password",
             },
-            registerBtn: {
-              label: "Sign up",
+          ],
+          registerInputs: [
+            {
+              containerClass: "RML-form-group",
+              label: "Email",
+              type: "email",
+              inputClass: "RML-form-control",
+              id: "email",
+              name: "email",
+              placeholder: "Email",
             },
-            loginInputs: [
-              {
-                containerClass: "RML-form-group",
-                label: "Email",
-                type: "email",
-                inputClass: "RML-form-control",
-                id: "email",
-                name: "email",
-                placeholder: "Email",
-              },
-              {
-                containerClass: "RML-form-group",
-                label: "Password",
-                type: "password",
-                inputClass: "RML-form-control",
-                id: "password",
-                name: "password",
-                placeholder: "Password",
-              },
-            ],
-            registerInputs: [
-              {
-                containerClass: "RML-form-group",
-                label: "Email",
-                type: "email",
-                inputClass: "RML-form-control",
-                id: "email",
-                name: "email",
-                placeholder: "Email",
-              },
-              {
-                containerClass: "RML-form-group",
-                label: "Password",
-                type: "password",
-                inputClass: "RML-form-control",
-                id: "password",
-                name: "password",
-                placeholder: "Password",
-              },
-            ],
-            // recoverPasswordInputs: [
-            //   {
-            //     containerClass: "RML-form-group",
-            //     label: "Email",
-            //     type: "email",
-            //     inputClass: "RML-form-control",
-            //     id: "email",
-            //     name: "email",
-            //     placeholder: "Email",
-            //   },
-            // ],
-          }}
-        />
-      </Container>
+            {
+              containerClass: "RML-form-group",
+              label: "Password",
+              type: "password",
+              inputClass: "RML-form-control",
+              id: "password",
+              name: "password",
+              placeholder: "Password",
+            },
+          ],
+          // recoverPasswordInputs: [
+          //   {
+          //     containerClass: "RML-form-group",
+          //     label: "Email",
+          //     type: "email",
+          //     inputClass: "RML-form-control",
+          //     id: "email",
+          //     name: "email",
+          //     placeholder: "Email",
+          //   },
+          // ],
+        }}
+      />
     </>
   );
 }

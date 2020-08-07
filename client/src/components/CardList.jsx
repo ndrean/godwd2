@@ -297,8 +297,7 @@ function CardList({ user, users, events, ...props }) {
                 onClick={handleShow}
                 style={{ fontSize: "30px" }}
               >
-                <FontAwesomeIcon icon="fa-check" />{" "}
-                <span> Create an event</span>
+                <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span>
               </Button>
 
               <EventModal show={show} onhandleClose={handleClose}>
