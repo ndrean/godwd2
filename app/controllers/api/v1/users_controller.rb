@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  #before_action( :authenticate_user, only: [ :destroy] )
+  before_action( :authenticate_user, only: [ :destroy, :profile] )
 
   # endpoint check user
   def profile
@@ -14,17 +14,19 @@ class Api::V1::UsersController < ApplicationController
       user.save
       user.access_token = Knock::AuthToken.new(payload: {sub: user.id}).token
       user.save
+      logger.debug ".........1...#{user.email}"
     end
     if fb_user.confirm_token.blank? && !fb_user.confirm_email
       fb_user.confirm_token = SecureRandom.urlsafe_base64.to_s
       UserMailer.register(fb_user.email, fb_user.confirm_token).deliver_later
       fb_user.save
+      render json: fb_user, status: 200
     end
     if fb_user.confirm_email
-      #logger.debug ".............CONFIRMED BY MAIL....#{fb_user.confirm_email}"
+      fb_user.access_token = Knock::AuthToken.new(payload: {sub: fb_user.id}).token
+      fb_user.save
       return render json: fb_user, status: 200
     end
-    render json: fb_user, status: 200
   end
 
   # POST '/api/v1/CreateUser'

@@ -10,7 +10,7 @@ class Api::V1::EventsController < ApplicationController
       Event.includes(:user, :itinary).where(itinary: [upcoming_itinaries])
       .to_json( include: [ 
           user: {only: [:email]},
-          itinary: {only: [:date, :start, :end]}
+          itinary: {only: [:date, :start, :end, :start_gps, :end_gps]}
           ]
       )
   end

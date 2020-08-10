@@ -1,3 +1,7 @@
+# Docker
+
+<https://dev.to/raphael_jambalos/more-than-hello-world-in-docker-run-rails-sidekiq-web-apps-in-docker-1b37>
+
 # OINK
 
 Inspection of Active Record
@@ -42,7 +46,7 @@ gem bcrypt, jwt, knock, dotnev-rails, racks-cors
   config.token_secret_signature_key = -> { Rails.application.secrets.secret_key_base }
 ```
 
-Include `Knock` in all controllers, set in parent class `ActionController::API`:
+To include `Knock` in all controllers, set in parent class: `ActionController::API` and make all other controllers inherite from `ApplicationController`:
 
 ```ruby
 # controllers/application_controller
@@ -53,7 +57,7 @@ end
 
 # Models & migration
 
-Generate 3 models, `User`, `Itinary` & `Event` where `Event` is a joint table of `users` and `itinaries` (so contains 2 keys).
+Generate 3 models, `User`, `Itinary` & `Event` where `Event` is a joint table of `users` and `itinaries` (so contains 2 keys). Since we use encrypted password with the gem `bcrypt`, we set `password_digest` (and not `password`) in the _user_ model and set `has_secure_password` in the model:
 
 ```bash
 >rails generate model User email name password_digest confirm_token confirm_email:boolean access_token uid
@@ -64,11 +68,9 @@ Generate 3 models, `User`, `Itinary` & `Event` where `Event` is a joint table of
 
 ```
 
-## Model User
-
 ```ruby
 # /app/models/User.rb
-lass User < ApplicationRecord
+class User < ApplicationRecord
   # bcrypt
   has_secure_password
 
@@ -84,12 +86,8 @@ lass User < ApplicationRecord
 end
 ```
 
-and for email validation:
+and for email validation, we use a regex:
 `validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i`
-
-## Model Itinary
-
-## Model Event
 
 # Namespace routes
 
@@ -120,7 +118,7 @@ and add in `index.js`:
 import "bootstrap/dist/css/bootstrap.min.css";
 ```
 
-and use:
+and use for example:
 
 ```js
 import Button from "react-bootstrap/Button";
@@ -128,14 +126,16 @@ import Button from "react-bootstrap/Button";
 
 # foreman
 
-Do not install `foreman` in the `Gemfile` but do (server side):
+To use one command to launch Rails, webpack-dev-server, Sidekiq, we use the gem `foreman` and create a file `Procfile` (located at the root of the project).
+
+Do not install `foreman` in the `Gemfile` but do:
 
 ```bash
 > gem install foreman
 > bundle install
 ```
 
-Append the `ProcFile` with the process (React front end, Rails API back end, Sidekiq...):
+Append the `ProcFile` with the required processes (React front end, Rails API back end, Sidekiq...):
 
 ```
 # ProcFile

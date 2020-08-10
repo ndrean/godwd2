@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import MyNavBar from "./MyNavBar";
 import CardList from "./CardList";
+import DisplayMap from "../geoloc/MyMap";
 
 import { eventsEndPoint, usersEndPoint } from "../helpers/endpoints";
 
@@ -77,15 +78,17 @@ export default function App() {
         user={user}
         onhandleAddUser={handleAddUser}
         onhandleUpdateEvents={handleUpdateEvents}
-      />
-      <CardList
-        user={user}
-        users={users}
-        events={events}
-        onhandleRemoveEvent={handleRemoveEvent}
-        onhandleAddEvent={handleAddEvent}
-        onhandleUpdateEvents={handleUpdateEvents}
-      />
+      >
+        <CardList
+          user={user}
+          users={users}
+          events={events}
+          onhandleRemoveEvent={handleRemoveEvent}
+          onhandleAddEvent={handleAddEvent}
+          onhandleUpdateEvents={handleUpdateEvents}
+        />
+        <DisplayMap />
+      </MyNavBar>
     </>
   );
 }

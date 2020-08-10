@@ -17,7 +17,7 @@ function Details(props) {
   return (
     <>
       <Button variant="outline-primary" onClick={props.onhandleShowDetail}>
-        <FontAwesomeIcon icon={faSignInAlt} size="2x" />
+        <FontAwesomeIcon icon="sign-in-alt" size="2x" />
       </Button>
       <Modal
         show={props.modalId === props.index}
@@ -64,7 +64,7 @@ function Details(props) {
             onClick={props.onhandlePush}
             disabled={props.onCheckUserDemand()}
           >
-            <FontAwesomeIcon icon={faShare} /> Ask to participate
+            <FontAwesomeIcon icon="share" /> Ask to participate
           </Button>
         </Modal.Body>
         <Modal.Footer>

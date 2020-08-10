@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/faker-ruby/faker.git
-  revision: 66e6113c29438e70bcc6a031971efe60ae06b71f
+  revision: f094e2bfe437700335a6ec8f9d7340968283f350
   branch: master
   specs:
     faker (2.13.0)
@@ -111,8 +111,6 @@ GEM
     loofah (2.6.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
-    macaddr (1.7.2)
-      systemu (~> 2.6.5)
     mail (2.7.1)
       mini_mime (>= 0.1.1)
     mailgun-ruby (1.2.0)
@@ -179,8 +177,6 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    ruby-growl (4.1)
-      uuid (~> 2.3, >= 2.3.5)
     sidekiq (6.1.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
@@ -198,7 +194,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    systemu (2.6.5)
     thor (1.0.1)
     thread_safe (0.3.6)
     tzinfo (1.2.7)
@@ -207,8 +202,6 @@ GEM
       unf_ext
     unf_ext (0.0.7.7)
     uniform_notifier (1.13.0)
-    uuid (2.3.9)
-      macaddr (~> 1.0)
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -236,7 +229,6 @@ DEPENDENCIES
   rack-cors
   rails (~> 6.0.3, >= 6.0.3.2)
   redis (~> 4.0)
-  ruby-growl
   sidekiq
   sidekiq-failures (~> 1.0)
   spring
@@ -247,4 +239,4 @@ RUBY VERSION
    ruby 2.6.6p146
 
 BUNDLED WITH
-   1.17.2
+   2.1.4

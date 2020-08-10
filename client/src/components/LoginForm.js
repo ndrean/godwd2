@@ -54,7 +54,7 @@ function LoginForm({ user, ...props }) {
 
   async function saveUser(jwt, user) {
     setLoggedIn(true);
-    localStorage.setItem("jwt", jwt);
+    localStorage.setItem("jwt", true);
     localStorage.setItem("user", user.email);
     alert(`Welcome ${user.email}`);
     // take user up tp App
@@ -90,6 +90,7 @@ fields=id,name,email,picture.width(640).height(640)`);
           uid: id,
         },
       };
+      console.log(fbUserData);
       const queryAppToken = await fetch(uri + "/api/v1/findCreateFbUser", {
         method: "POST",
         body: JSON.stringify(fbUserData),
@@ -97,7 +98,6 @@ fields=id,name,email,picture.width(640).height(640)`);
       });
       if (queryAppToken.ok) {
         const { access_token } = await queryAppToken.json();
-        console.log(access_token);
         try {
           const getCurrentUser = await fetch(uri + "/api/v1/profile", {
             headers: { authorization: "Bearer " + access_token },

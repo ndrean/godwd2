@@ -45,13 +45,6 @@ function GeolocProvider(props) {
           height="40px"
         />
       </button>
-      {accept &&
-        pos &&
-        {
-          /* window.alert(
-          `Your position is: latitude: ${pos.Lat} et Longitude: ${pos.Lng}`
-        )  */
-        } && <PositionContext.Provider value={pos} />}
     </>
   );
 }

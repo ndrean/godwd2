@@ -34,7 +34,12 @@ function CardList({ user, users, events, ...props }) {
   const [show, setShow] = useState(false); // modal
   const [modalId, setModalId] = useState(null);
 
+  // const [state, setState] = useState(props);
   console.log("_render CardList_");
+
+  // React.useEffect(() => {
+  //   setState(props);
+  // }, [props]);
 
   // modal in a list: use index boolean
   const handleCloseDetail = () => setModalId(null);
@@ -272,7 +277,7 @@ function CardList({ user, users, events, ...props }) {
         (participant) => participant.email === user.email
       );
       if (checkDemander) {
-        window.alert("Already done!");
+        window.alert("Already confirmed!");
         return true;
       }
     }
@@ -301,6 +306,7 @@ function CardList({ user, users, events, ...props }) {
               </Button>
 
               <EventModal show={show} onhandleClose={handleClose}>
+                {/* this child goes into the body of the modal */}
                 <EventForm
                   users={users}
                   participants={participants}

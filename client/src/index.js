@@ -18,6 +18,7 @@ import {
   faPaperPlane,
   faCamera,
   faGlobeAmericas,
+  faSignInAlt,
 } from "@fortawesome/free-solid-svg-icons";
 library.add(
   faTrash,
@@ -29,7 +30,8 @@ library.add(
   faShare,
   faPaperPlane,
   faCamera,
-  faGlobeAmericas
+  faGlobeAmericas,
+  faSignInAlt
 );
 
 // <React.StrictMode></React.StrictMode>

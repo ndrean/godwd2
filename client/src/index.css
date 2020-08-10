@@ -11,3 +11,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#map {
+  width: 50vw;
+  height: 50vh;
+}
+
+.navbar {
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  padding-bottom: 30px;
+  width: 100%;
+}
+
+.navbar a {
+  float: left;
+  display: block;
+  text-align: center;
+}
