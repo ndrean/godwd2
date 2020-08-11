@@ -1,9 +1,11 @@
+import L, { coordsToLatLng } from "leaflet";
+
 export default function convertToGeojson(data) {
   const geojsonElt = {
     type: "Feature",
     geometry: {
       type: "LineString",
-      coordinates: "",
+      coordinates: [],
     },
     properties: {
       start: "",
@@ -18,21 +20,21 @@ export default function convertToGeojson(data) {
   const geojson = [];
 
   data.forEach((d) => {
-    const {
-      geometry: { coordinates },
-      properties: { start, end, eventID, participants, date, itinaryID },
-    } = geojsonElt;
     geojson.push({
       ...geojsonElt,
-      coordinates: [d.itinary.start_gps, d.itinary.end_gps],
-      start: d.itinary.start,
-      end: d.itinary.end,
-      itinaryID: d.itinary_id,
-      eventID: d.id,
-      participants: d.participants,
-      date: d.itinary.date,
+      geometry: {
+        type: "LineString",
+        coordinates: [d.itinary.start_gps, d.itinary.end_gps],
+      },
+      properties: {
+        start: d.itinary.start,
+        end: d.itinary.end,
+        itinaryID: d.itinary_id,
+        eventID: d.id,
+        participants: d.participants,
+        date: d.itinary.date,
+      },
     });
   });
-
   return geojson;
 }
