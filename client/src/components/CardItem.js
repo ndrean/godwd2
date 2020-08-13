@@ -18,14 +18,15 @@ export default function CardItem({ event, ...props }) {
               variant="top"
               src={event.directCLurl || require("../assets/pointreyes.jpg")}
               alt="Card image"
-              style={{ height: "250px", opacity: "0.6" }}
+              style={{ height: "270px", opacity: "0.6" }}
             />
             <Card.ImgOverlay>
               <Card.Title>{event.itinary.date}</Card.Title>
 
-              <Card.Text style={{ fontWeight: "bold", fontSize: "20px" }}>
+              <Card.Text style={{ fontWeight: "bold", fontSize: "12px" }}>
                 Organizer: {event.user.email}
                 <br />
+                Distance: {event.itinary.distance} <br />
                 From: {event.itinary.start} <br />
                 To: {event.itinary.end} <br />
               </Card.Text>

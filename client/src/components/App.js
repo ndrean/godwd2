@@ -101,7 +101,11 @@ export default function App() {
       />
 
       <Container>
-        <DisplayMap user={user} />
+        <DisplayMap
+          user={user}
+          token={jwtToken}
+          onhandleUpdateEvents={handleUpdateEvents}
+        />
       </Container>
     </>
   );

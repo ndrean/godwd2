@@ -27,11 +27,12 @@ function Details(props) {
         <Modal.Header closeButton>
           <Modal.Title>
             Date: {event.itinary.date} <br />
-            From: {event.itinary.start} <br />
-            To: {event.itinary.end}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <p>From: {event.itinary.start}</p>
+          <p>To: {event.itinary.end}</p>
+          <p>Distance: {event.itinary.distance}</p>
           <p>
             Participants{" "}
             <span style={{ fontSize: "12px" }}>

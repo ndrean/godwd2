@@ -10,7 +10,7 @@ class Api::V1::EventsController < ApplicationController
       Event.includes(:user, :itinary).where(itinary: [upcoming_itinaries])
       .to_json( include: [ 
           user: {only: [:email]},
-          itinary: {only: [:date, :start, :end, :start_gps, :end_gps]}
+          itinary: {only: [:date, :start, :end, :start_gps, :end_gps, :distance]}
           ]
       )
   end
@@ -147,7 +147,13 @@ class Api::V1::EventsController < ApplicationController
   private
     def event_params
       #logger.debug "................#{params.require(:event).fetch(:participants,[]).map(&:keys.to_sym).flatten.uniq}"
-      params.require(:event).permit( :user,  :directCLurl, :publicID,  itinary_attributes: [:date, :start, :end], participants: [:email, :notif, :id, :ptoken]) #photo for Active Storage
+      params.require(:event).permit( 
+        :user,
+        :directCLurl,
+        :publicID,
+        itinary_attributes: [:date, :start, :end, :distance, :start_gps =>[], :end_gps=>[]],
+        participants: [:email, :notif, :id, :ptoken]
+      ) #photo for Active Storage
       #:participants => sp_keys)#, [:email, :id])
     end
     

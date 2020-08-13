@@ -10,11 +10,12 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import convertToGeojson from "../helpers/convertToGeojson";
+import fetchAll from "../helpers/fetchAll";
 import "../index.css";
 
 export default function DisplayMap(props) {
   //const [point, setPoint] = useState("");
-  const [itinary, setItinary] = useState([]);
+  //const [itinary, setItinary] = useState([]);
   const [startPoint, setStartPoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
   const [date, setDate] = useState("");
@@ -22,8 +23,8 @@ export default function DisplayMap(props) {
   const mapRef = useRef(null);
   const markersLayer = React.useRef(L.layerGroup([]));
 
+  let itinary = "";
   let address = [];
-  let test = [];
 
   useEffect(() => {
     mapRef.current = L.map("map", {
@@ -198,7 +199,7 @@ export default function DisplayMap(props) {
           }).addTo(mapRef.current);
         }
       });
-  }, []);
+  }, [props.events]);
 
   function onEachFeature(feature, layer) {
     if (feature.geometry.coordinates) {
@@ -232,9 +233,11 @@ export default function DisplayMap(props) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!startPoint || !endPoint) {
+    if (!props.user) return window.alert("Please login");
+
+    if (!startPoint || !endPoint)
       return window.alert("Please select two points");
-    }
+
     const distance =
       startPoint.start_gps && endPoint.end_gps
         ? (
@@ -244,21 +247,41 @@ export default function DisplayMap(props) {
           ).toFixed(0)
         : null;
 
-    setItinary({
+    itinary = {
       date: date,
       start: startPoint.start,
       start_gps: startPoint.start_gps,
       end: endPoint.end,
       end_gps: endPoint.end_gps,
       distance: distance,
-    });
-    window.alert("Saved!");
-    setStartPoint("");
-    setEndPoint("");
-    address = [];
-    setDate("");
-    mapRef.current.removeLayer(markersLayer.current);
+    };
+    const formdata = new FormData();
+    for (const key in itinary) {
+      console.log(key, itinary[key]);
+      formdata.append(`event[itinary_attributes][${key}]`, itinary[key]);
+    }
+
+    // !!!!! no headers "Content-type".. for formdata !!!!!
+    fetchAll({
+      method: "POST",
+      index: "",
+      body: formdata,
+      token: props.token,
+    })
+      .then((result) => {
+        if (result) {
+          props.onhandleUpdateEvents(result);
+          window.alert("Saved!");
+          setStartPoint("");
+          setEndPoint("");
+          address = [];
+          setDate("");
+          mapRef.current.removeLayer(markersLayer.current);
+        }
+      })
+      .catch((err) => console.log(err));
   }
+
   function onStartChange() {}
   function onEndChange() {}
 
