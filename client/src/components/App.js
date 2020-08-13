@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import Container from "react-bootstrap/Container";
 
 import MyNavBar from "./MyNavBar";
 import CardList from "./CardList";
 import DisplayMap from "../geoloc/MyMap";
 
 import { eventsEndPoint, usersEndPoint } from "../helpers/endpoints";
+import "../index.css";
 
 export default function App() {
   console.log("__App__");
@@ -12,6 +14,7 @@ export default function App() {
   const [events, setEvents] = useState("");
   const [user, setUser] = useState("");
   const [loading, setLoading] = useState(false);
+  const [jwtToken, setJwtToken] = useState("");
 
   useEffect(() => {
     (async function fetchData() {
@@ -71,24 +74,35 @@ export default function App() {
     console.log("*updateEvts*");
     setEvents(results);
   }
+  function handleToken(value) {
+    setJwtToken(value);
+  }
 
+  function removeToken() {
+    setJwtToken("");
+  }
   return (
     <>
       <MyNavBar
         user={user}
+        onhandleToken={handleToken}
+        onRemoveToken={removeToken}
         onhandleAddUser={handleAddUser}
         onhandleUpdateEvents={handleUpdateEvents}
-      >
-        <CardList
-          user={user}
-          users={users}
-          events={events}
-          onhandleRemoveEvent={handleRemoveEvent}
-          onhandleAddEvent={handleAddEvent}
-          onhandleUpdateEvents={handleUpdateEvents}
-        />
-        <DisplayMap />
-      </MyNavBar>
+      />
+      <CardList
+        user={user}
+        token={jwtToken}
+        users={users}
+        events={events}
+        onhandleRemoveEvent={handleRemoveEvent}
+        onhandleAddEvent={handleAddEvent}
+        onhandleUpdateEvents={handleUpdateEvents}
+      />
+
+      <Container>
+        <DisplayMap user={user} />
+      </Container>
     </>
   );
 }

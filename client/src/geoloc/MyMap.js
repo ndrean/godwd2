@@ -2,16 +2,28 @@ import React, { useRef, useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import L, { marker } from "leaflet";
 import * as esriGeocode from "esri-leaflet-geocoder";
-import "../index.css";
-import { redIcon, greenIcon, blueIcon } from "./Icon";
-import convertToGeojson from "../helpers/convertToGeojson";
 
-export default function DisplayMap() {
+import { redIcon, greenIcon, blueIcon } from "./Icon";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import convertToGeojson from "../helpers/convertToGeojson";
+import "../index.css";
+
+export default function DisplayMap(props) {
   //const [point, setPoint] = useState("");
   const [itinary, setItinary] = useState([]);
+  const [startPoint, setStartPoint] = useState("");
+  const [endPoint, setEndPoint] = useState("");
+  const [date, setDate] = useState("");
 
   const mapRef = useRef(null);
   const markersLayer = React.useRef(L.layerGroup([]));
+
+  let address = [];
+  let test = [];
 
   useEffect(() => {
     mapRef.current = L.map("map", {
@@ -25,7 +37,10 @@ export default function DisplayMap() {
       ],
     });
     L.control.scale().addTo(mapRef.current);
-    return () => mapRef.current.remove();
+    return () => {
+      mapRef.current.remove();
+      console.log("removed");
+    };
   }, []);
 
   const html = `<p>
@@ -52,7 +67,7 @@ export default function DisplayMap() {
       collapseAfterResult: true,
       allowMultipleResults: true,
     }).addTo(mapRef.current);
-
+    // https://github.com/Esri/esri-leaflet-geocoder
     searchControl.on("results", (e) => {
       if (!e.results) {
         return alert("Not found");
@@ -68,14 +83,12 @@ export default function DisplayMap() {
       const popup = resultMarker.bindPopup(content);
       popup.openPopup();
       if (popup) {
-        const chemin = handlePopupPlace(popup, place, gps, resultMarker);
-        console.log("chemin", chemin);
+        handlePopupPlace(popup, place, gps, resultMarker);
       }
     });
   }, []);
 
   // find address on click with reverseGeocode (ESRI)
-  //const mymarker = useRef(null);
   useEffect(() => {
     mapRef.current.on("click", (e) => {
       const mymarker = marker(e.latlng, { icon: blueIcon }).addTo(
@@ -98,9 +111,6 @@ export default function DisplayMap() {
           address: { CountryCode, ShortLabel, City },
         } = result;
         const place = [ShortLabel, City, CountryCode];
-        //const marker = L.marker(gps, { icon: greenIcon }).addTo(
-        //  markersLayer.current
-        //);
         const content = L.DomUtil.create("div");
         content.innerHTML = `
           <p>${ShortLabel}</p>
@@ -108,62 +118,69 @@ export default function DisplayMap() {
           <p>
           ${html}
           `;
-        const popup = mymarker.bindPopup(content).openPopup();
+        const popup = mymarker.bindPopup(content);
+        popup.openPopup();
         if (popup) {
-          const chemin = handlePopupPlace(popup, place, gps, mymarker);
-          console.log(chemin);
+          handlePopupPlace(popup, place, gps, mymarker);
         }
       });
   }
 
-  let address = [];
   function handlePopupPlace(popup, place, gps, mymarker) {
-    popup.on("popupclose", () => {
-      let place_val = "";
-      const check = document.body.querySelectorAll('input[type="radio"]');
-      check.forEach((c) => {
+    popup.on("popupclose", (e) => {
+      const getId = e.target._leaflet_id;
+      let typeValue = "";
+      const typeRadio = document.body.querySelectorAll('input[type="radio"]');
+      typeRadio.forEach((c) => {
         if (c.checked) {
-          place_val = c.value;
+          typeValue = c.value;
         }
       });
-
-      if (place_val === "start") {
+      if (typeValue === "start") {
         if (Array.isArray(place)) {
           place = place.join(" ");
         }
-        setItinary((prev) => [
-          ...prev,
-          { start: place, start_gps: [gps.lat, gps.lng] },
-        ]);
-        address = [...address, { start: place, start_gps: [gps.lat, gps.lng] }];
-      } else if (place_val === "end") {
-        if (Array.isArray(place)) {
-          place = place.join(" ");
-        }
-
-        setItinary((prev) => [
-          ...prev,
-          { end: place, end_gps: [gps.lat, gps.lng] },
-        ]);
-        address = [...address, { end: place, end_gps: [gps.lat, gps.lng] }];
-      } else if (place_val === "remove") {
-        address = address.filter((a) => {
-          return (
-            (a.start_gps !== undefined &&
-              a.start_gps[0] !== gps.lat &&
-              a.start_gps[1] !== gps.lng) ||
-            (a.end_gps !== undefined &&
-              a.end_gps[0] !== gps.lat &&
-              a.end_gps[1] !== gps.lng)
-          );
+        setStartPoint({
+          start: place,
+          start_gps: [gps.lat, gps.lng],
+          id: e.target._leaflet_id,
         });
+
+        if (address.find((a) => Object.keys(a).includes("start"))) {
+          address = address.filter((a) => !Object.keys(a).includes("start"));
+        }
+        address = [
+          ...address,
+          {
+            start: place,
+            start_gps: [gps.lat, gps.lng],
+            id: e.target._leaflet_id,
+          },
+        ];
+      } else if (typeValue === "end") {
+        if (Array.isArray(place)) {
+          place = place.join(" ");
+        }
+        setEndPoint({
+          end: place,
+          end_gps: [gps.lat, gps.lng],
+          id: e.target._leaflet_id,
+        });
+
+        if (address.find((a) => Object.keys(a).includes("end"))) {
+          address = address.filter((a) => !Object.keys(a).includes("end"));
+        }
+        address = [
+          ...address,
+          {
+            end: place,
+            end_gps: [gps.lat, gps.lng],
+            id: e.target._leaflet_id,
+          },
+        ];
+      } else if (typeValue === "remove") {
+        address = address.filter((a) => a.id !== getId);
         markersLayer.current.removeLayer(mymarker);
-      }
-      console.log(address);
-      if (address.length > 2) {
-        return window.alert(
-          "A path has only two points, starting and ending point"
-        );
       }
       return address;
     });
@@ -174,6 +191,7 @@ export default function DisplayMap() {
     fetch("/api/v1/events")
       .then((res) => res.json())
       .then((res) => {
+        console.log(res);
         if (res) {
           L.geoJSON(convertToGeojson(res), {
             onEachFeature: onEachFeature,
@@ -183,37 +201,119 @@ export default function DisplayMap() {
   }, []);
 
   function onEachFeature(feature, layer) {
-    const start = marker(feature.geometry.coordinates[0], {
-      icon: redIcon,
-    }).addTo(mapRef.current);
-    const end = marker(feature.geometry.coordinates[1], {
-      icon: greenIcon,
-    }).addTo(mapRef.current);
-    L.polyline(feature.geometry.coordinates).addTo(mapRef.current);
+    if (feature.geometry.coordinates) {
+      const start = marker(feature.geometry.coordinates[0], {
+        icon: redIcon,
+      }).addTo(mapRef.current);
+      const end = marker(feature.geometry.coordinates[1], {
+        icon: greenIcon,
+      }).addTo(mapRef.current);
+      L.polyline(feature.geometry.coordinates).addTo(mapRef.current);
 
-    const distance = Math.round(
-      parseFloat(
-        L.latLng(feature.geometry.coordinates[0]).distanceTo(
-          L.latLng(feature.geometry.coordinates[1])
-        ),
-        0
-      ) / 1000
-    );
+      const distance = Math.round(
+        parseFloat(
+          L.latLng(feature.geometry.coordinates[0]).distanceTo(
+            L.latLng(feature.geometry.coordinates[1])
+          ),
+          0
+        ) / 1000
+      );
 
-    const content = L.DomUtil.create("div");
-    content.innerHTML = `
+      const content = L.DomUtil.create("div");
+      content.innerHTML = `
       <h3>${feature.properties.date} </h3>
       <p> From: ${feature.properties.start}</p>
       <p> To:  ${feature.properties.end} </p>
       <p> Distance: ${distance} km </p>`;
-    start.bindPopup(content);
-    end.bindPopup(content);
+      start.bindPopup(content);
+      end.bindPopup(content);
+    }
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!startPoint || !endPoint) {
+      return window.alert("Please select two points");
+    }
+    const distance =
+      startPoint.start_gps && endPoint.end_gps
+        ? (
+            L.latLng(startPoint.start_gps).distanceTo(
+              L.latLng(endPoint.end_gps)
+            ) / 1000
+          ).toFixed(0)
+        : null;
+
+    setItinary({
+      date: date,
+      start: startPoint.start,
+      start_gps: startPoint.start_gps,
+      end: endPoint.end,
+      end_gps: endPoint.end_gps,
+      distance: distance,
+    });
+    window.alert("Saved!");
+    setStartPoint("");
+    setEndPoint("");
+    address = [];
+    setDate("");
+    mapRef.current.removeLayer(markersLayer.current);
+  }
+  function onStartChange() {}
+  function onEndChange() {}
+
+  function handleDate(e) {
+    setDate(e.target.value);
   }
 
   return (
-    <div className="center">
-      <button>Save</button>
-      <div id="map"></div>
-    </div>
+    <Container>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group controlId="formPlaintextItinary">
+          <Form.Label>Starting point:</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows="2"
+            readOnly
+            required
+            value={startPoint ? startPoint.start : null}
+            onChange={onStartChange}
+          />
+        </Form.Group>
+
+        <Form.Group controlId="formPlaintextPassword">
+          <Form.Label>Ending point::</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows="2"
+            readOnly
+            required
+            value={endPoint ? endPoint.end : null}
+            onChange={onEndChange}
+          />
+        </Form.Group>
+        <Form.Control
+          type="date"
+          value={date || ""}
+          name="date"
+          required
+          onChange={handleDate}
+        />
+        <Row>
+          <Button variant="primary" type="submit">
+            Submit
+          </Button>
+        </Row>
+      </Form>
+
+      <br />
+      <p>
+        Click on the map or use the 'Search' box to define a point, and assign
+        'start' or 'end' to define an event.
+      </p>
+      <Row>
+        <div id="map"></div>
+      </Row>
+    </Container>
   );
 }

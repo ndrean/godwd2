@@ -55,11 +55,12 @@ function LoginForm({ user, ...props }) {
   async function saveUser(jwt, user) {
     setLoggedIn(true);
     localStorage.setItem("jwt", true);
+    props.onhandleToken(jwt);
     localStorage.setItem("user", user.email);
     alert(`Welcome ${user.email}`);
     // take user up tp App
     props.handleAddUser(user);
-    const queryRefresh = await fetch(uri + "/api/v1/events");
+    const queryRefresh = await fetch("/api/v1/events");
     props.onhandleUpdateEvents(await queryRefresh.json());
   }
 
@@ -91,15 +92,16 @@ fields=id,name,email,picture.width(640).height(640)`);
         },
       };
       console.log(fbUserData);
-      const queryAppToken = await fetch(uri + "/api/v1/findCreateFbUser", {
+      const queryAppToken = await fetch("/api/v1/findCreateFbUser", {
         method: "POST",
         body: JSON.stringify(fbUserData),
         headers: { "Content-Type": "application/json" },
       });
       if (queryAppToken.ok) {
         const { access_token } = await queryAppToken.json();
+        console.log(access_token);
         try {
-          const getCurrentUser = await fetch(uri + "/api/v1/profile", {
+          const getCurrentUser = await fetch("/api/v1/profile", {
             headers: { authorization: "Bearer " + access_token },
           });
           const currentUser = await getCurrentUser.json();
@@ -125,7 +127,7 @@ fields=id,name,email,picture.width(640).height(640)`);
     if (method === "formUp") {
       // 1- check if user already exists with these credentials
       try {
-        const getUserToken = await fetch(uri + "/api/v1/getUserToken", {
+        const getUserToken = await fetch("/api/v1/getUserToken", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -135,7 +137,7 @@ fields=id,name,email,picture.width(640).height(640)`);
 
         if (getUserToken.ok) {
           const { jwt } = await getUserToken.json();
-          const getCurrentUser = await fetch(uri + "/api/v1/profile", {
+          const getCurrentUser = await fetch("/api/v1/profile", {
             headers: { authorization: "Bearer " + jwt },
           });
           const currentUser = await getCurrentUser.json();
@@ -151,7 +153,7 @@ fields=id,name,email,picture.width(640).height(640)`);
           const userData = JSON.stringify({
             user: { email: response.email, password: response.password },
           });
-          const checkUser = await fetch(uri + "/api/v1/createUser", {
+          const checkUser = await fetch("/api/v1/createUser", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: userData,
@@ -159,7 +161,7 @@ fields=id,name,email,picture.width(640).height(640)`);
 
           if (checkUser.ok) {
             try {
-              const getUserToken = await fetch(uri + "/api/v1/getUserToken", {
+              const getUserToken = await fetch("/api/v1/getUserToken", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -172,7 +174,7 @@ fields=id,name,email,picture.width(640).height(640)`);
                 const { jwt } = await getUserToken.json();
 
                 // check in db if email_confirmed with the token
-                const getCurrentUser = await fetch(uri + "/api/v1/profile", {
+                const getCurrentUser = await fetch("/api/v1/profile", {
                   headers: { authorization: "Bearer " + jwt },
                 });
                 const currentUser = await getCurrentUser.json();
@@ -201,7 +203,7 @@ fields=id,name,email,picture.width(640).height(640)`);
     if (method === "formIn") {
       // check user with the jwt token return from the backend
       try {
-        const getUserToken = await fetch(uri + "/api/v1/getUserToken", {
+        const getUserToken = await fetch("/api/v1/getUserToken", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -212,7 +214,7 @@ fields=id,name,email,picture.width(640).height(640)`);
         if (getUserToken.ok) {
           // need to have mail checked to enter
           const { jwt } = await getUserToken.json();
-          const getCurrentUser = await fetch(uri + "/api/v1/profile", {
+          const getCurrentUser = await fetch("/api/v1/profile", {
             headers: { authorization: "Bearer " + jwt },
           });
           const currentUser = await getCurrentUser.json();
@@ -243,6 +245,7 @@ fields=id,name,email,picture.width(640).height(640)`);
     localStorage.removeItem("jwt");
     localStorage.removeItem("user");
     setInitialTab("login");
+    props.onRemoveToken();
   }
 
   function startLoading() {
@@ -251,6 +254,11 @@ fields=id,name,email,picture.width(640).height(640)`);
 
   function finishLoading() {
     setLoading(false);
+  }
+
+  function logOut() {
+    props.onRemoveToken();
+    window.alert("bye");
   }
 
   return (
@@ -279,6 +287,7 @@ fields=id,name,email,picture.width(640).height(640)`);
             localStorage.removeItem("user");
             setAvatar("");
             setResult("");
+            logOut();
           }}
           style={{
             padding: "5px",
@@ -319,6 +328,7 @@ fields=id,name,email,picture.width(640).height(640)`);
             label: "Continue with Facebook",
           },
         }}
+        separator={{ label: "or" }}
         form={{
           onLogin: onLogin,
           onRegister: onRegister,
@@ -368,17 +378,6 @@ fields=id,name,email,picture.width(640).height(640)`);
               placeholder: "Password",
             },
           ],
-          // recoverPasswordInputs: [
-          //   {
-          //     containerClass: "RML-form-group",
-          //     label: "Email",
-          //     type: "email",
-          //     inputClass: "RML-form-control",
-          //     id: "email",
-          //     name: "email",
-          //     placeholder: "Email",
-          //   },
-          // ],
         }}
       />
     </>

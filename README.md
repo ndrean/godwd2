@@ -192,3 +192,9 @@ then don't need to import, just use strings
 # CLoudinary
 
 Go to Cloudinary dashboard and download cloudinary.yml and place it into '/config/cloudinary.yml'.
+
+# Local SSL certificate (macOS)
+
+<https://flaviocopes.com/macos-install-ssl-local/>
+
+> Change `http://localhost:3000/api/v1/..` to `/api/v1/...` in all `fetch` requests.

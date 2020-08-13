@@ -3,12 +3,12 @@ import { eventsEndPoint } from "./endpoints";
 import returnUnauthorized from "./returnUnauthorized";
 import fetchWithToken from "./fetchWithToken";
 
-async function fetchAll({ method, index, body }) {
+async function fetchAll({ method, index, body, token }) {
   try {
     const query = await fetch(eventsEndPoint + index, {
       method: method,
       headers: {
-        Authorization: "Bearer " + localStorage.getItem("jwt"),
+        Authorization: "Bearer " + token, //localStorage.getItem("jwt"),
       },
       index: index,
       body: body,

@@ -19,6 +19,9 @@ import returnUnauthorized from "../helpers/returnUnauthorized";
 import { eventsEndPoint, usersEndPoint } from "../helpers/endpoints"; // const endpoints
 import cloudName from "../config/cloudName"; // for Cloudinary
 
+// import L, { marker } from "leaflet";
+// import * as esriGeocode from "esri-leaflet-geocoder";
+
 const uri = process.env.REACT_APP_URL;
 
 function CardList({ user, users, events, ...props }) {
@@ -68,11 +71,12 @@ function CardList({ user, users, events, ...props }) {
 
     if (window.confirm("Confirm removal?")) {
       try {
-        const query = await fetchWithToken(eventsEndPoint + event.id, {
+        const query = await fetch(eventsEndPoint + event.id, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
+            authorization: "Bearer " + props.token,
           },
         }); // then new updated rows
         if (query.status !== 200) {
@@ -102,6 +106,9 @@ function CardList({ user, users, events, ...props }) {
 
   async function handleFormSubmit(e) {
     e.preventDefault();
+    // const map = L.mam("formmap");
+    // const search = L.esriGeocoding.geosearch().addTo(map);
+
     if (!user) return window.alert("Please login");
 
     // 1st promise to append non-async data to the FormData
@@ -159,6 +166,7 @@ function CardList({ user, users, events, ...props }) {
             method: "POST",
             index: "",
             body: data,
+            token: props.token,
           })
             .then((result) => {
               if (result) {
@@ -172,6 +180,7 @@ function CardList({ user, users, events, ...props }) {
             method: "PATCH",
             index: indexEdit,
             body: data,
+            token: props.token,
           })
             .then((result) => {
               if (result) {
@@ -248,8 +257,12 @@ function CardList({ user, users, events, ...props }) {
         owner: event.user.email,
         event: event,
       });
-      await fetchWithToken(uri + "/api/v1/pushDemand", {
+      await fetch("/api/v1/pushDemand", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + props.token,
+        },
         body: demand,
       });
       window.alert("Mail sent");
@@ -286,7 +299,7 @@ function CardList({ user, users, events, ...props }) {
 
   return (
     <>
-      {!events || !users ? (
+      {/* {!events || !users ? (
         <Container>
           <Row className="justify-content-md-center">
             <BePatient go={loading} />
@@ -294,63 +307,62 @@ function CardList({ user, users, events, ...props }) {
         </Container>
       ) : (
         <>
-          <br />
-          <Container>
-            <Row style={{ justifyContent: "center" }}>
-              <Button
-                variant="outline-dark"
-                onClick={handleShow}
-                style={{ fontSize: "30px" }}
+          <br /> */}
+      <Container>
+        <Row style={{ justifyContent: "center" }}>
+          <Button
+            variant="outline-dark"
+            onClick={handleShow}
+            style={{ fontSize: "30px" }}
+          >
+            <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span>
+          </Button>
+
+          <EventModal show={show} onhandleClose={handleClose}>
+            {/* this child goes into the body of the modal */}
+            <EventForm
+              users={users}
+              participants={participants}
+              date={itinary.date}
+              start={itinary.start}
+              end={itinary.end}
+              previewCL={previewCL}
+              publicID={publicID}
+              loading={loading}
+              onFormSubmit={handleFormSubmit}
+              onhandleItinaryChange={handleItinaryChange}
+              onSelectChange={handleSelectChange}
+              onhandlePictureCL={handlePictureCL}
+            />
+          </EventModal>
+        </Row>
+
+        <br />
+
+        {events &&
+          events.map((event, index) => {
+            return (
+              <CardItem
+                key={event.id}
+                event={event}
+                onhandleRemove={(e) => handleRemove(e, event)}
+                onhandleEdit={() => handleEdit(event)}
               >
-                <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span>
-              </Button>
-
-              <EventModal show={show} onhandleClose={handleClose}>
-                {/* this child goes into the body of the modal */}
-                <EventForm
-                  users={users}
-                  participants={participants}
-                  date={itinary.date}
-                  start={itinary.start}
-                  end={itinary.end}
-                  previewCL={previewCL}
-                  publicID={publicID}
-                  loading={loading}
-                  onFormSubmit={handleFormSubmit}
-                  onhandleItinaryChange={handleItinaryChange}
-                  onSelectChange={handleSelectChange}
-                  onhandlePictureCL={handlePictureCL}
-                />
-              </EventModal>
-            </Row>
-          </Container>
-          <br />
-
-          {events &&
-            events.map((event, index) => {
-              return (
-                <CardItem
-                  key={event.id}
+                <Details
                   event={event}
-                  onhandleRemove={(e) => handleRemove(e, event)}
-                  onhandleEdit={() => handleEdit(event)}
-                >
-                  <Details
-                    event={event}
-                    index={index}
-                    modalId={modalId}
-                    onhandleShowDetail={() => handleShowDetail(index)}
-                    onhandlePush={() => handlePush(event)}
-                    onhandleCloseDetail={() => handleCloseDetail(index)}
-                    onCheckUserDemand={() =>
-                      checkUserDemand(index, modalId, event)
-                    }
-                  />
-                </CardItem>
-              );
-            })}
-        </>
-      )}
+                  index={index}
+                  modalId={modalId}
+                  onhandleShowDetail={() => handleShowDetail(index)}
+                  onhandlePush={() => handlePush(event)}
+                  onhandleCloseDetail={() => handleCloseDetail(index)}
+                  onCheckUserDemand={() =>
+                    checkUserDemand(index, modalId, event)
+                  }
+                />
+              </CardItem>
+            );
+          })}
+      </Container>
     </>
   );
 }

@@ -19,7 +19,7 @@ code {
 }
 
 #map {
-  width: 50vw;
+  width: 100vw;
   height: 50vh;
 }
 
@@ -27,7 +27,7 @@ code {
   overflow: hidden;
   position: fixed;
   top: 0;
-  padding-bottom: 30px;
+  padding-bottom: 0px;
   width: 100%;
 }
 
@@ -35,4 +35,8 @@ code {
   float: left;
   display: block;
   text-align: center;
+}
+
+body {
+  padding-top: 95px;
 }
