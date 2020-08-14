@@ -29,7 +29,7 @@ export default function DisplayMap(props) {
   useEffect(() => {
     mapRef.current = L.map("map", {
       center: [45, 1],
-      zoom: 8,
+      zoom: 5,
       layers: [
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution:
@@ -143,7 +143,7 @@ export default function DisplayMap(props) {
         }
         setStartPoint({
           start: place,
-          start_gps: [gps.lat, gps.lng],
+          start_gps: gps,
           id: e.target._leaflet_id,
         });
 
@@ -154,7 +154,7 @@ export default function DisplayMap(props) {
           ...address,
           {
             start: place,
-            start_gps: [gps.lat, gps.lng],
+            start_gps: gps, //[gps.lat, gps.lng],
             id: e.target._leaflet_id,
           },
         ];
@@ -164,7 +164,7 @@ export default function DisplayMap(props) {
         }
         setEndPoint({
           end: place,
-          end_gps: [gps.lat, gps.lng],
+          end_gps: gps, //[gps.lat, gps.lng],
           id: e.target._leaflet_id,
         });
 
@@ -189,27 +189,31 @@ export default function DisplayMap(props) {
 
   // display the events
   React.useEffect(() => {
+    console.log("_fetch Events_");
     fetch("/api/v1/events")
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
+        mapRef.current.removeLayer(markersLayer.current);
         if (res) {
           L.geoJSON(convertToGeojson(res), {
             onEachFeature: onEachFeature,
-          }).addTo(mapRef.current);
+          }).addTo(markersLayer.current);
+          markersLayer.current.addTo(mapRef.current);
         }
       });
+    return () => markersLayer.current.clearLayers();
   }, [props.events]);
 
   function onEachFeature(feature, layer) {
     if (feature.geometry.coordinates) {
       const start = marker(feature.geometry.coordinates[0], {
         icon: redIcon,
-      }).addTo(mapRef.current);
+      }).addTo(markersLayer.current);
       const end = marker(feature.geometry.coordinates[1], {
         icon: greenIcon,
-      }).addTo(mapRef.current);
-      L.polyline(feature.geometry.coordinates).addTo(mapRef.current);
+      }).addTo(markersLayer.current);
+      L.polyline(feature.geometry.coordinates).addTo(markersLayer.current);
 
       const distance = Math.round(
         parseFloat(
@@ -250,16 +254,20 @@ export default function DisplayMap(props) {
     itinary = {
       date: date,
       start: startPoint.start,
-      start_gps: startPoint.start_gps,
+      start_gps: [startPoint.start_gps.lat, startPoint.start_gps.lng],
       end: endPoint.end,
-      end_gps: endPoint.end_gps,
+      end_gps: [endPoint.end_gps.lat, endPoint.end_gps.lng],
       distance: distance,
     };
     const formdata = new FormData();
-    for (const key in itinary) {
-      console.log(key, itinary[key]);
-      formdata.append(`event[itinary_attributes][${key}]`, itinary[key]);
-    }
+    formdata.append("event[itinary_attributes][date]", itinary.date);
+    formdata.append("event[itinary_attributes][start]", itinary.start);
+    formdata.append("event[itinary_attributes][end]", itinary.end);
+    formdata.append("event[itinary_attributes][distance]", itinary.distance);
+    formdata.append("event[itinary_attributes][start_gps][]", [
+      itinary.start_gps,
+    ]);
+    formdata.append("event[itinary_attributes][end_gps][]", [itinary.end_gps]);
 
     // !!!!! no headers "Content-type".. for formdata !!!!!
     fetchAll({
@@ -299,7 +307,7 @@ export default function DisplayMap(props) {
             rows="2"
             readOnly
             required
-            value={startPoint ? startPoint.start : null}
+            value={startPoint ? startPoint.start : ""}
             onChange={onStartChange}
           />
         </Form.Group>
@@ -311,7 +319,7 @@ export default function DisplayMap(props) {
             rows="2"
             readOnly
             required
-            value={endPoint ? endPoint.end : null}
+            value={endPoint ? endPoint.end : ""}
             onChange={onEndChange}
           />
         </Form.Group>

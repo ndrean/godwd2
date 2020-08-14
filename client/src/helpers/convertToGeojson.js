@@ -21,24 +21,35 @@ export default function convertToGeojson(data) {
   if (data) {
     data.forEach((d) => {
       if (d.itinary.start_gps || d.itinary_end_gps) {
-        geojson.push({
-          ...geojsonElt,
-          geometry: {
-            type: "LineString",
-            coordinates: [d.itinary.start_gps, d.itinary.end_gps],
-          },
-          properties: {
-            start: d.itinary.start,
-            end: d.itinary.end,
-            itinaryID: d.itinary_id,
-            eventID: d.id,
-            participants: d.participants,
-            date: d.itinary.date,
-          },
-        });
+        if (d.itinary.start_gps.length > 0 || d.itinary.end_gps.length > 0) {
+          geojson.push({
+            ...geojsonElt,
+            geometry: {
+              type: "LineString",
+              coordinates: [
+                [
+                  parseFloat(d.itinary.start_gps[0]),
+                  parseFloat(d.itinary.start_gps[1]),
+                ],
+                [
+                  parseFloat(d.itinary.end_gps[0]),
+                  parseFloat(d.itinary.end_gps[1]),
+                ],
+              ],
+            },
+            properties: {
+              start: d.itinary.start,
+              end: d.itinary.end,
+              itinaryID: d.itinary_id,
+              eventID: d.id,
+              participants: d.participants,
+              date: d.itinary.date,
+            },
+          });
+        }
       }
     });
   }
-
+  console.log(geojson);
   return geojson;
 }

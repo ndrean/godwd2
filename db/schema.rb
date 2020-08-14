@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_13_185921) do
+ActiveRecord::Schema.define(version: 2020_08_14_145723) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,13 +31,13 @@ ActiveRecord::Schema.define(version: 2020_08_13_185921) do
   create_table "itinaries", force: :cascade do |t|
     t.date "date"
     t.string "start"
-    t.string "start_gps", array: true
     t.string "end"
-    t.string "end_gps", array: true
     t.string "picture"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "distance"
+    t.decimal "end_gps", default: [], array: true
+    t.decimal "start_gps", default: [], array: true
   end
 
   create_table "users", force: :cascade do |t|

@@ -91,7 +91,6 @@ fields=id,name,email,picture.width(640).height(640)`);
           uid: id,
         },
       };
-      console.log(fbUserData);
       const queryAppToken = await fetch("/api/v1/findCreateFbUser", {
         method: "POST",
         body: JSON.stringify(fbUserData),

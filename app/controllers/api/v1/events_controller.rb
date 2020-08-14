@@ -10,7 +10,7 @@ class Api::V1::EventsController < ApplicationController
       Event.includes(:user, :itinary).where(itinary: [upcoming_itinaries])
       .to_json( include: [ 
           user: {only: [:email]},
-          itinary: {only: [:date, :start, :end, :start_gps, :end_gps, :distance]}
+          itinary: {only: [:date, :start, :end, :distance, :start_gps, :end_gps ]}
           ]
       )
   end
@@ -27,7 +27,21 @@ class Api::V1::EventsController < ApplicationController
   end
 
   # POST '/api/v1/events'
-  def create
+  def create   
+    if params[:event][:itinary_attributes][:start_gps]
+      params[:event][:itinary_attributes][:start_gps] = params[:event][:itinary_attributes][:start_gps][0].split(',')
+      params[:event][:itinary_attributes][:end_gps] = params[:event][:itinary_attributes][:end_gps][0].split(',')
+    end
+    #params.permit!
+    event_params = params.require(:event).permit( 
+        :user,
+        :directCLurl,
+        :publicID,
+        itinary_attributes: [:date, :start, :end, :distance, start_gps: [], end_gps: []],
+        participants: [:email, :notif, :id, :ptoken]
+      ) 
+    
+    
     event = Event.new(event_params)
     event.user = current_user
     return render json: event.errors.full_messages, status: :unprocessable_entity if !event.save
@@ -151,10 +165,11 @@ class Api::V1::EventsController < ApplicationController
         :user,
         :directCLurl,
         :publicID,
-        itinary_attributes: [:date, :start, :end, :distance, :start_gps =>[], :end_gps=>[]],
+        itinary_attributes: [:date, :start, :end, :distance, start_gps: [], end_gps: []],
         participants: [:email, :notif, :id, :ptoken]
       ) #photo for Active Storage
       #:participants => sp_keys)#, [:email, :id])
+      
     end
     
     def handle_unauthorized(current, user)

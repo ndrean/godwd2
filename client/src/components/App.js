@@ -105,6 +105,7 @@ export default function App() {
           user={user}
           token={jwtToken}
           onhandleUpdateEvents={handleUpdateEvents}
+          events={events}
         />
       </Container>
     </>
