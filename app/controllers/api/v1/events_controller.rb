@@ -37,8 +37,9 @@ class Api::V1::EventsController < ApplicationController
         :user,
         :directCLurl,
         :publicID,
+        :comment,
         itinary_attributes: [:date, :start, :end, :distance, start_gps: [], end_gps: []],
-        participants: [:email, :notif, :id, :ptoken]
+        participants: [:email, :notif, :id, :ptoken],
       ) 
     
     
@@ -75,6 +76,21 @@ class Api::V1::EventsController < ApplicationController
     # if we update direct link, then first remove from CL if one exists
     RemoveDirectLink.perform_later(event.publicID) if event_params[:directCLurl] && event.directCLurl
 
+    # to accept an array, we need to separate between the ','
+    if params[:event][:itinary_attributes][:start_gps]
+      params[:event][:itinary_attributes][:start_gps] = params[:event][:itinary_attributes][:start_gps][0].split(',')
+      params[:event][:itinary_attributes][:end_gps] = params[:event][:itinary_attributes][:end_gps][0].split(',')
+    end
+    #params.permit!
+    event_params = params.require(:event).permit( 
+        :user,
+        :directCLurl,
+        :publicID,
+        :comment,
+        itinary_attributes: [:date, :start, :end, :distance, start_gps: [], end_gps: []],
+        participants: [:email, :notif, :id, :ptoken],
+      ) 
+      
     if event.update(event_params)
       # if a new picture is saved to Active Storage, update link
       # if a direct link to CL is done, the links will be in the params
@@ -165,6 +181,7 @@ class Api::V1::EventsController < ApplicationController
         :user,
         :directCLurl,
         :publicID,
+        :comment,
         itinary_attributes: [:date, :start, :end, :distance, start_gps: [], end_gps: []],
         participants: [:email, :notif, :id, :ptoken]
       ) #photo for Active Storage
@@ -172,11 +189,11 @@ class Api::V1::EventsController < ApplicationController
       
     end
     
-    def handle_unauthorized(current, user)
-      unless current == user
-        render json: {status: 401, errors: ['unauthorized']}
-      end
-    end
+    # def handle_unauthorized(current, user)
+    #   unless current == user
+    #     render json: {status: 401, errors: ['unauthorized']}
+    #   end
+    # end
 
     # def find_value_in_nested_hash(data, desired_value)
     #   data.values.each do |value| 

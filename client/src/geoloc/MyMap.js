@@ -95,6 +95,7 @@ export default function DisplayMap(props) {
       const mymarker = marker(e.latlng, { icon: blueIcon }).addTo(
         markersLayer.current
       );
+
       markersLayer.current.addTo(mapRef.current);
       reverseGeocode(e.latlng, mymarker);
     });
@@ -340,7 +341,8 @@ export default function DisplayMap(props) {
       <br />
       <p>
         Click on the map or use the 'Search' box to define a point, and assign
-        'start' or 'end' to define an event.
+        'start' or 'end' to define an event. Once you defined the event, you can
+        invit people by editing the event. You can delete it there too.
       </p>
       <Row>
         <div id="map"></div>

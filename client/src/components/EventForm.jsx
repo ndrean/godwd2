@@ -19,11 +19,13 @@ const EventForm = (props) => {
     date,
     start,
     end,
+    comment,
     loading,
     previewCL,
     publicID,
     onFormSubmit,
     onhandleItinaryChange,
+    onhandleCommentChange,
     onSelectChange,
     onhandlePictureCL,
   } = props;
@@ -103,7 +105,14 @@ const EventForm = (props) => {
 
         <Form.Group controlId="ControlComment">
           <Form.Label>Comments</Form.Label>
-          <Form.Control as="textarea" rows="2" />
+          <Form.Control
+            as="textarea"
+            rows="2"
+            type="text"
+            name="comment"
+            value={comment || ""}
+            onChange={onhandleCommentChange}
+          />
         </Form.Group>
 
         <Row style={{ justifyContent: "center" }}>

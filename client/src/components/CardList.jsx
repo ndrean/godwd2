@@ -25,7 +25,7 @@ import cloudName from "../config/cloudName"; // for Cloudinary
 const uri = process.env.REACT_APP_URL;
 
 function CardList({ user, users, events, ...props }) {
-  // events= [event:{user, itinary, participants, url, publicID}]
+  // events= [event:{user, itinary, participants, url, publicID, comment}]
   const [itinary, setItinary] = useState(""); // array [date, start, end, startGSP, endGPS]
   const [fileCL, setFileCL] = useState("");
   const [previewCL, setPreviewCL] = useState(""); // preview photo
@@ -36,6 +36,7 @@ function CardList({ user, users, events, ...props }) {
   const [indexEdit, setIndexEdit] = useState(null); // :id for PATCH
   const [show, setShow] = useState(false); // modal
   const [modalId, setModalId] = useState(null);
+  const [comment, setComment] = useState("");
 
   // const [state, setState] = useState(props);
   console.log("_render CardList_");
@@ -62,6 +63,7 @@ function CardList({ user, users, events, ...props }) {
     setIndexEdit("");
     setChanged(false);
     setModalId(null);
+    setComment("");
   };
 
   // remove row from table
@@ -98,10 +100,10 @@ function CardList({ user, users, events, ...props }) {
   // POST or PATCH the modal form:
   /* => object formdata to pass to the backend
     {event: {
-      itinary_attributes:{date:xxx, start:xxx, end:xxx},
+      itinary_attributes:{date:xxx, start:xxx, end:xxx, start_gps:[x,x], end_gps:[x,x]}
       participants:[{email:xxx,notif:bool}, {...}],
       photo : "http://res.cloudinary.com/xxx",
-      directClURL, publicID
+      directClURL, publicID, comment
     */
 
   async function handleFormSubmit(e) {
@@ -113,10 +115,18 @@ function CardList({ user, users, events, ...props }) {
 
     // 1st promise to append non-async data to the FormData
     function init(fd) {
-      for (const key in itinary) {
-        console.log(key, itinary[key]);
-        fd.append(`event[itinary_attributes][${key}]`, itinary[key]);
-      }
+      fd.append("event[comment]", comment);
+      // for (const key in ["date", "start", "end"]) {
+      //   console.log(key, itinary[key]);
+      //   fd.append(`event[itinary_attributes][${key}]`, itinary[key]);
+      // }
+      fd.append("event[itinary_attributes][date]", itinary.date);
+      fd.append("event[itinary_attributes][start]", itinary.start);
+      fd.append("event[itinary_attributes][end]", itinary.end);
+      fd.append("event[itinary_attributes][distance]", itinary.distance);
+      fd.append("event[itinary_attributes][start_gps][]", itinary.start_gps);
+      fd.append("event[itinary_attributes][end_gps][]", itinary.end_gps);
+
       if (participants.length > 0) {
         participants.forEach((member) => {
           for (const key in member) {
@@ -197,12 +207,16 @@ function CardList({ user, users, events, ...props }) {
   async function handleEdit(event) {
     setIndexEdit(event.id); // get /api/v1/events/:id
     const data = events.find((ev) => ev.id === event.id);
+    console.log(data);
     setItinary({
       date: new Date(data.itinary.date).toISOString().slice(0, 10),
       start: data.itinary.start,
       end: data.itinary.end,
+      start_gps: data.itinary.start_gps,
+      end_gps: data.itinary.end_gps,
     });
     setParticipants(data.participants || []);
+    setComment(data.comment || "");
 
     if (event.publicID) {
       setPublicID(event.publicID);
@@ -239,6 +253,10 @@ function CardList({ user, users, events, ...props }) {
       ...itinary,
       [e.target.name]: e.target.value,
     });
+  }
+
+  function handleCommentChange(e) {
+    setComment(e.target.value);
   }
 
   async function handlePictureCL(e) {
@@ -326,6 +344,7 @@ function CardList({ user, users, events, ...props }) {
               date={itinary.date}
               start={itinary.start}
               end={itinary.end}
+              comment={comment}
               previewCL={previewCL}
               publicID={publicID}
               loading={loading}
@@ -333,6 +352,7 @@ function CardList({ user, users, events, ...props }) {
               onhandleItinaryChange={handleItinaryChange}
               onSelectChange={handleSelectChange}
               onhandlePictureCL={handlePictureCL}
+              onhandleCommentChange={handleCommentChange}
             />
           </EventModal>
         </Row>
