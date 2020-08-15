@@ -8,7 +8,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShare, faSignInAlt } from "@fortawesome/free-solid-svg-icons";
+//import { faShare, faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 
 function Details(props) {
   console.log("*details*");
@@ -63,7 +63,8 @@ function Details(props) {
           <Button
             variant="primary"
             onClick={props.onhandlePush}
-            disabled={props.onCheckUserDemand()}
+            disabled={props.checkUser}
+            // {props.onCheckUserDemand}
           >
             <FontAwesomeIcon icon="share" /> Ask to participate
           </Button>

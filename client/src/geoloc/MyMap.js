@@ -6,7 +6,7 @@ import * as esriGeocode from "esri-leaflet-geocoder";
 import { redIcon, greenIcon, blueIcon } from "./Icon";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+//import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import convertToGeojson from "../helpers/convertToGeojson";
@@ -14,8 +14,6 @@ import fetchAll from "../helpers/fetchAll";
 import "../index.css";
 
 export default function DisplayMap(props) {
-  //const [point, setPoint] = useState("");
-  //const [itinary, setItinary] = useState([]);
   const [startPoint, setStartPoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
   const [date, setDate] = useState("");
@@ -95,7 +93,6 @@ export default function DisplayMap(props) {
       const mymarker = marker(e.latlng, { icon: blueIcon }).addTo(
         markersLayer.current
       );
-
       markersLayer.current.addTo(mapRef.current);
       reverseGeocode(e.latlng, mymarker);
     });
@@ -194,7 +191,6 @@ export default function DisplayMap(props) {
     fetch("/api/v1/events")
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         mapRef.current.removeLayer(markersLayer.current);
         if (res) {
           L.geoJSON(convertToGeojson(res), {
@@ -265,10 +261,16 @@ export default function DisplayMap(props) {
     formdata.append("event[itinary_attributes][start]", itinary.start);
     formdata.append("event[itinary_attributes][end]", itinary.end);
     formdata.append("event[itinary_attributes][distance]", itinary.distance);
-    formdata.append("event[itinary_attributes][start_gps][]", [
-      itinary.start_gps,
-    ]);
-    formdata.append("event[itinary_attributes][end_gps][]", [itinary.end_gps]);
+    formdata.append(
+      "event[itinary_attributes][start_gps][]",
+      itinary.start_gps[0]
+    );
+    formdata.append(
+      "event[itinary_attributes][start_gps][]",
+      itinary.start_gps[1]
+    );
+    formdata.append("event[itinary_attributes][end_gps][]", itinary.end_gps[0]);
+    formdata.append("event[itinary_attributes][end_gps][]", itinary.end_gps[1]);
 
     // !!!!! no headers "Content-type".. for formdata !!!!!
     fetchAll({
@@ -280,7 +282,9 @@ export default function DisplayMap(props) {
       .then((result) => {
         if (result) {
           props.onhandleUpdateEvents(result);
-          window.alert("Saved!");
+          window.alert(
+            "Saved! If you want invite buddies, edit the new Event you created and select them. You can also add a picture and add comments."
+          );
           setStartPoint("");
           setEndPoint("");
           address = [];
@@ -299,7 +303,7 @@ export default function DisplayMap(props) {
   }
 
   return (
-    <Container>
+    <Container fluid>
       <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formPlaintextItinary">
           <Form.Label>Starting point:</Form.Label>
@@ -330,12 +334,15 @@ export default function DisplayMap(props) {
           name="date"
           required
           onChange={handleDate}
+          isInvalid={!date}
         />
-        <Row>
-          <Button variant="primary" type="submit">
+        <Form.Control.Feedback type="invalid">{!date}</Form.Control.Feedback>
+        <br />
+        <Form.Group style={{ display: "flex", justifyContent: "center" }}>
+          <Button variant="primary" type="submit" size="lg">
             Submit
           </Button>
-        </Row>
+        </Form.Group>
       </Form>
 
       <br />

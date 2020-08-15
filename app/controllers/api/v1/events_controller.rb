@@ -28,10 +28,10 @@ class Api::V1::EventsController < ApplicationController
 
   # POST '/api/v1/events'
   def create   
-    if params[:event][:itinary_attributes][:start_gps]
-      params[:event][:itinary_attributes][:start_gps] = params[:event][:itinary_attributes][:start_gps][0].split(',')
-      params[:event][:itinary_attributes][:end_gps] = params[:event][:itinary_attributes][:end_gps][0].split(',')
-    end
+    # if params[:event][:itinary_attributes][:start_gps]
+    #   params[:event][:itinary_attributes][:start_gps] = params[:event][:itinary_attributes][:start_gps][0].split(',')
+    #   params[:event][:itinary_attributes][:end_gps] = params[:event][:itinary_attributes][:end_gps][0].split(',')
+    # end
     #params.permit!
     event_params = params.require(:event).permit( 
         :user,
@@ -141,6 +141,7 @@ class Api::V1::EventsController < ApplicationController
     itinary_id = params[:event][:itinary_id]
     token = SecureRandom.urlsafe_base64.to_s
     event = Event.find(params[:event][:id])
+    event.participants=[] if event.participants == nil
     event.participants << {email: params[:user][:email], notif: false, ptoken: token}
     event.save
     EventMailer.demand(current_user.email , owner.email, itinary_id, token )
@@ -156,8 +157,10 @@ class Api::V1::EventsController < ApplicationController
   def confirm_demand
     owner = params[:name]
     itinary = Itinary.find(params[:itinary])
-    events = Event.joins(:user).where("users.email LIKE ?", owner)
+    #events = Event.joins(:user).where("users.email LIKE ?", owner)
+    events = Event.includes(:user).where(users: {email: owner})
     events.each do |event|
+      return if !event.participants
       event.participants.each do |p|
         # logger.debug "........T1..#{p['email']} #{p['email'] == params[:user]}"
         if p['ptoken'] && p['ptoken']== params[:ptoken]

@@ -52,6 +52,7 @@ const EventForm = (props) => {
             name="date"
             required
             onChange={onhandleItinaryChange}
+            isInvalid={!date}
           />
         </Form.Group>
 
@@ -63,6 +64,7 @@ const EventForm = (props) => {
             required
             name="start"
             onChange={onhandleItinaryChange}
+            isInvalid={!start}
           />
         </Form.Group>
 
@@ -74,6 +76,7 @@ const EventForm = (props) => {
             required
             name="end"
             onChange={onhandleItinaryChange}
+            isInvalid={!end}
           />
         </Form.Group>
         <Form.Group controlId="ControlKiters">

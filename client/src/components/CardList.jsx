@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -10,19 +10,14 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import CardItem from "./CardItem";
 import Details from "./Details";
 
-import BePatient from "./BePatient";
 import EventModal from "./EventModal";
 import EventForm from "./EventForm";
-import fetchWithToken from "../helpers/fetchWithToken";
 import fetchAll from "../helpers/fetchAll"; // returns data after PATCH or POST depending upon endpoint
 import returnUnauthorized from "../helpers/returnUnauthorized";
-import { eventsEndPoint, usersEndPoint } from "../helpers/endpoints"; // const endpoints
+import { eventsEndPoint } from "../helpers/endpoints"; // const endpoints
 import cloudName from "../config/cloudName"; // for Cloudinary
 
-// import L, { marker } from "leaflet";
-// import * as esriGeocode from "esri-leaflet-geocoder";
-
-const uri = process.env.REACT_APP_URL;
+//const uri = process.env.REACT_APP_URL;
 
 function CardList({ user, users, events, ...props }) {
   // events= [event:{user, itinary, participants, url, publicID, comment}]
@@ -37,6 +32,7 @@ function CardList({ user, users, events, ...props }) {
   const [show, setShow] = useState(false); // modal
   const [modalId, setModalId] = useState(null);
   const [comment, setComment] = useState("");
+  const [checkUser, setCheckUser] = useState(false);
 
   // const [state, setState] = useState(props);
   console.log("_render CardList_");
@@ -46,7 +42,10 @@ function CardList({ user, users, events, ...props }) {
   // }, [props]);
 
   // modal in a list: use index boolean
-  const handleCloseDetail = () => setModalId(null);
+  const handleCloseDetail = () => {
+    setModalId(null);
+    setCheckUser(false);
+  };
 
   const handleShowDetail = (index) => {
     setModalId(index);
@@ -124,13 +123,14 @@ function CardList({ user, users, events, ...props }) {
       fd.append("event[itinary_attributes][start]", itinary.start);
       fd.append("event[itinary_attributes][end]", itinary.end);
       fd.append("event[itinary_attributes][distance]", itinary.distance);
+      // the back-end will split the 'start_gps' array
       fd.append("event[itinary_attributes][start_gps][]", itinary.start_gps);
       fd.append("event[itinary_attributes][end_gps][]", itinary.end_gps);
 
       if (participants.length > 0) {
         participants.forEach((member) => {
           for (const key in member) {
-            console.log(key, member[key]);
+            // console.log(key, member[key]);
             fd.append(`event[participants][][${key}]`, member[key]);
           }
         });
@@ -203,17 +203,19 @@ function CardList({ user, users, events, ...props }) {
     handleClose(); // reset
   }
 
+  useEffect(() => {}, [events, user]);
+
   // Edit event
   async function handleEdit(event) {
     setIndexEdit(event.id); // get /api/v1/events/:id
     const data = events.find((ev) => ev.id === event.id);
-    console.log(data);
     setItinary({
       date: new Date(data.itinary.date).toISOString().slice(0, 10),
       start: data.itinary.start,
       end: data.itinary.end,
       start_gps: data.itinary.start_gps,
       end_gps: data.itinary.end_gps,
+      distance: data.itinary.distance,
     });
     setParticipants(data.participants || []);
     setComment(data.comment || "");
@@ -268,8 +270,12 @@ function CardList({ user, users, events, ...props }) {
   }
 
   // send mail to ask to join an event
-  async function handlePush(event) {
-    if (user) {
+  // added index, modaldId to args
+  async function handlePush(index, modalId, event) {
+    const check = checkUserDemand(index, modalId, event);
+    console.log(check);
+    setCheckUser(check);
+    if (user && !check) {
       const demand = JSON.stringify({
         user: user, //,currentUser,
         owner: event.user.email,
@@ -291,12 +297,13 @@ function CardList({ user, users, events, ...props }) {
       }
       handleCloseDetail();
     } else {
-      window.alert("Please login");
+      window.alert("Not authorized");
       handleCloseDetail();
     }
   }
 
   function checkUserDemand(index, modalId, event) {
+    console.log(index, modalId);
     if (index !== modalId) return null;
     console.log("*check*");
     if (user) {
@@ -304,12 +311,15 @@ function CardList({ user, users, events, ...props }) {
         window.alert("You are asking to yourself...! ;)");
         return true;
       }
-      const checkDemander = event.participants.find(
-        (participant) => participant.email === user.email
-      );
-      if (checkDemander) {
-        window.alert("Already confirmed!");
-        return true;
+      if (!(event.participants === null)) {
+        const checkDemander = event.participants.find(
+          (participant) => participant.email === user.email
+        );
+        console.log("demander", checkDemander);
+        if (checkDemander) {
+          //window.alert("Already confirmed!");
+          return true;
+        }
       }
     }
     return false;
@@ -373,11 +383,12 @@ function CardList({ user, users, events, ...props }) {
                   index={index}
                   modalId={modalId}
                   onhandleShowDetail={() => handleShowDetail(index)}
-                  onhandlePush={() => handlePush(event)}
+                  onhandlePush={() => handlePush(index, modalId, event)}
                   onhandleCloseDetail={() => handleCloseDetail(index)}
-                  onCheckUserDemand={() =>
-                    checkUserDemand(index, modalId, event)
-                  }
+                  checkUser={checkUser}
+                  // onCheckUserDemand={() =>
+                  //   checkUserDemand(index, modalId, event)
+                  // }
                 />
               </CardItem>
             );

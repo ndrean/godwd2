@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 
 import facebookConfig from "../config/facebookConfig";
 
-const uri = process.env.REACT_APP_URL;
+//const uri = process.env.REACT_APP_URL;
 
 function LoginForm({ user, ...props }) {
   console.log("__render Login__");

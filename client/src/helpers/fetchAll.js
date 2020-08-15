@@ -1,7 +1,6 @@
 // import fetchWithToken from "./fetchWithToken";
 import { eventsEndPoint } from "./endpoints";
 import returnUnauthorized from "./returnUnauthorized";
-import fetchWithToken from "./fetchWithToken";
 
 async function fetchAll({ method, index, body, token }) {
   try {

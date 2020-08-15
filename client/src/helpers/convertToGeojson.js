@@ -1,4 +1,4 @@
-import L, { coordsToLatLng } from "leaflet";
+//import L, { coordsToLatLng } from "leaflet";
 
 export default function convertToGeojson(data) {
   const geojsonElt = {
@@ -21,7 +21,7 @@ export default function convertToGeojson(data) {
   if (data) {
     data.forEach((d) => {
       if (d.itinary.start_gps || d.itinary_end_gps) {
-        if (d.itinary.start_gps.length > 0 || d.itinary.end_gps.length > 0) {
+        if (d.itinary.start_gps.length > 1 || d.itinary.end_gps.length > 1) {
           geojson.push({
             ...geojsonElt,
             geometry: {
@@ -50,6 +50,5 @@ export default function convertToGeojson(data) {
       }
     });
   }
-  console.log(geojson);
   return geojson;
 }
