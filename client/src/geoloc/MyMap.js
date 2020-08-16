@@ -188,6 +188,7 @@ export default function DisplayMap(props) {
   // display the events
   React.useEffect(() => {
     console.log("_fetch Events_");
+    const markLayerRef = markersLayer.current;
     fetch("/api/v1/events")
       .then((res) => res.json())
       .then((res) => {
@@ -199,7 +200,7 @@ export default function DisplayMap(props) {
           markersLayer.current.addTo(mapRef.current);
         }
       });
-    return () => markersLayer.current.clearLayers();
+    return () => markLayerRef.clearLayers();
   }, [props.events]);
 
   function onEachFeature(feature, layer) {

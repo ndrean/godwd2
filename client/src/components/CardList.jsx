@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
@@ -336,8 +338,9 @@ function CardList({ user, users, events, ...props }) {
       ) : (
         <>
           <br /> */}
+      {/* style={{ justifyContent: "center" }}*/}
       <Container>
-        <Row style={{ justifyContent: "center" }}>
+        <Row className="justify-content-md-center">
           <Button
             variant="outline-dark"
             onClick={handleShow}
@@ -345,26 +348,33 @@ function CardList({ user, users, events, ...props }) {
           >
             <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span>
           </Button>
-
-          <EventModal show={show && !loading} onhandleClose={handleClose}>
-            {/* this child goes into the body of the modal */}
-            <EventForm
-              users={users}
-              participants={participants}
-              date={itinary.date}
-              start={itinary.start}
-              end={itinary.end}
-              comment={comment}
-              previewCL={previewCL}
-              publicID={publicID}
-              //loading={loading}
-              onFormSubmit={handleFormSubmit}
-              onhandleItinaryChange={handleItinaryChange}
-              onSelectChange={handleSelectChange}
-              onhandlePictureCL={handlePictureCL}
-              onhandleCommentChange={handleCommentChange}
-            />
-          </EventModal>
+          {loading ? (
+            <Col xs={10} className="justify-content-md-center">
+              <Spinner animation="border" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+            </Col>
+          ) : (
+            <EventModal show={show && !loading} onhandleClose={handleClose}>
+              {/* this child goes into the body of the modal */}
+              <EventForm
+                users={users}
+                participants={participants}
+                date={itinary.date}
+                start={itinary.start}
+                end={itinary.end}
+                comment={comment}
+                previewCL={previewCL}
+                publicID={publicID}
+                //loading={loading}
+                onFormSubmit={handleFormSubmit}
+                onhandleItinaryChange={handleItinaryChange}
+                onSelectChange={handleSelectChange}
+                onhandlePictureCL={handlePictureCL}
+                onhandleCommentChange={handleCommentChange}
+              />
+            </EventModal>
+          )}
         </Row>
 
         <br />
