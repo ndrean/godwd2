@@ -5,9 +5,12 @@ import Button from "react-bootstrap/Button";
 function EventModal(props) {
   return (
     <>
-      <Modal show={props.show} onHide={props.onhandleClose}>
+      <Modal size="sm" show={props.show} onHide={props.onhandleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Define the event and invite kiters</Modal.Title>
+          <Modal.Title>
+            You can firstly define the event with the map, and then invite
+            buddies here and add a picture and comments.
+          </Modal.Title>
         </Modal.Header>
         {/* the form goes into the body as props.children */}
         <Modal.Body>{props.children}</Modal.Body>

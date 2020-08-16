@@ -123,7 +123,7 @@ const EventForm = (props) => {
             variant="outline-primary"
             type="submit"
             style={{ fontSize: "24px" }}
-            disabled={loading}
+            //disabled={loading}
           >
             <FontAwesomeIcon icon="paper-plane" /> Submit
           </Button>
@@ -133,8 +133,8 @@ const EventForm = (props) => {
       <br />
 
       <Row className="justify-content-md-center">
-        <Col xs={6} md="auto">
-          {publicID && (
+        <Col xs={8} md="auto">
+          {/* {publicID && (
             <CloudinaryContext cloudName={cloudName}>
               <div>
                 <CLImage
@@ -145,7 +145,7 @@ const EventForm = (props) => {
                 />
               </div>
             </CloudinaryContext>
-          )}
+          )} */}
           {previewCL && (
             <Image
               src={previewCL}

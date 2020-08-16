@@ -125,7 +125,7 @@ class Api::V1::EventsController < ApplicationController
     
     #async Active_Job  for Cloudinary
     RemoveDirectLink.perform_later(event.publicID) if event.publicID
-
+    
     event.itinary.destroy
     event.destroy
     return render json: {status: 200}

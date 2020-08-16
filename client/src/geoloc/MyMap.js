@@ -346,14 +346,15 @@ export default function DisplayMap(props) {
       </Form>
 
       <br />
-      <p>
-        Click on the map or use the 'Search' box to define a point, and assign
-        'start' or 'end' to define an event. Once you defined the event, you can
-        invit people by editing the event. You can delete it there too.
-      </p>
+
       <Row>
         <div id="map"></div>
       </Row>
+      <p>
+        Click on the map or use the 'Search' box to define a point, and assign
+        'start' or 'end' or remove it. Once you defined the event, you can
+        invite people by editing the event. You can only delete the event there.
+      </p>
     </Container>
   );
 }

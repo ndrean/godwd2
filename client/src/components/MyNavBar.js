@@ -39,10 +39,11 @@ function MyNavBar({
         />
         {/* </Nav.Link> */}
       </Nav>
-      <Nav.Link>
+
+      {/* <Nav.Link>
         <GeolocProvider />
-      </Nav.Link>
-      <Nav.Link href="#search">
+      </Nav.Link> */}
+      <Nav.Link href="#mapping">
         <Button variant="outline-light" type="submit">
           <FontAwesomeIcon icon="globe-americas" size="2x" />
         </Button>

@@ -34,6 +34,8 @@ function CardList({ user, users, events, ...props }) {
   const [comment, setComment] = useState("");
   const [checkUser, setCheckUser] = useState(false);
 
+  //const inputDateRef = React.useRef(null);
+
   // const [state, setState] = useState(props);
   console.log("_render CardList_");
 
@@ -107,8 +109,7 @@ function CardList({ user, users, events, ...props }) {
 
   async function handleFormSubmit(e) {
     e.preventDefault();
-    // const map = L.mam("formmap");
-    // const search = L.esriGeocoding.geosearch().addTo(map);
+    setLoading(true);
 
     if (!user) return window.alert("Please login");
 
@@ -199,7 +200,9 @@ function CardList({ user, users, events, ...props }) {
             })
             .catch((err) => console.log(err));
         }
-      });
+      })
+      .catch((err) => console.log(err))
+      .finally(() => setLoading(false));
     handleClose(); // reset
   }
 
@@ -308,16 +311,13 @@ function CardList({ user, users, events, ...props }) {
     console.log("*check*");
     if (user) {
       if (user.email === event.user.email) {
-        window.alert("You are asking to yourself...! ;)");
         return true;
       }
       if (!(event.participants === null)) {
         const checkDemander = event.participants.find(
           (participant) => participant.email === user.email
         );
-        console.log("demander", checkDemander);
         if (checkDemander) {
-          //window.alert("Already confirmed!");
           return true;
         }
       }
@@ -346,7 +346,7 @@ function CardList({ user, users, events, ...props }) {
             <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span>
           </Button>
 
-          <EventModal show={show} onhandleClose={handleClose}>
+          <EventModal show={show && !loading} onhandleClose={handleClose}>
             {/* this child goes into the body of the modal */}
             <EventForm
               users={users}
@@ -357,7 +357,7 @@ function CardList({ user, users, events, ...props }) {
               comment={comment}
               previewCL={previewCL}
               publicID={publicID}
-              loading={loading}
+              //loading={loading}
               onFormSubmit={handleFormSubmit}
               onhandleItinaryChange={handleItinaryChange}
               onSelectChange={handleSelectChange}

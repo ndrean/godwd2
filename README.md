@@ -1,3 +1,15 @@
+# overmind
+
+`overind start` will run the `ProcFile`:
+
+````
+#ProcFile
+web: cd client && PORT=3000 yarn run start
+api: PORT=3001 && bundle exec rails s
+worker: bundle exec sidekiq
+redis: redis-server --port 6379
+```
+
 # Docker
 
 <https://dev.to/raphael_jambalos/more-than-hello-world-in-docker-run-rails-sidekiq-web-apps-in-docker-1b37>
@@ -198,3 +210,8 @@ Go to Cloudinary dashboard and download cloudinary.yml and place it into '/confi
 <https://flaviocopes.com/macos-install-ssl-local/>
 
 > Change `http://localhost:3000/api/v1/..` to `/api/v1/...` in all `fetch` requests.
+````
+
+# ActionMailer
+
+<https://dev.to/morinoko/sending-emails-in-rails-with-action-mailer-and-gmail-35g4>

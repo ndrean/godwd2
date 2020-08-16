@@ -383,5 +383,4 @@ fields=id,name,email,picture.width(640).height(640)`);
   );
 }
 
-export default LoginForm;
-// export default React.memo(LoginForm);
+export default React.memo(LoginForm);
