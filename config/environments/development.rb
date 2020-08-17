@@ -3,6 +3,7 @@ Rails.application.configure do
   config.active_job.queue_adapter = :sidekiq
   
   config.action_mailer.delivery_method = :smtp # letter_opener
+  config.action_mailer.default_url_options = { host: 'http://godownwind.online'}
   routes.default_url_options[:host] = 'http://localhost:3001'
   # SMTP CONFIG IN '/initializers/smtp.rb
   
