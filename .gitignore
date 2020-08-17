@@ -34,3 +34,7 @@ cert.*
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+/config/credentials/development.key
+
+/config/credentials/production.key

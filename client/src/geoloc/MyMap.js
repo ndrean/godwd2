@@ -119,67 +119,103 @@ export default function DisplayMap(props) {
           `;
         const popup = mymarker.bindPopup(content);
         popup.openPopup();
-        if (popup) {
-          handlePopupPlace(popup, place, gps, mymarker);
-        }
+        //if (popup) {
+        handlePopupPlace(popup, place, gps, mymarker);
+        //}
       });
   }
 
   function handlePopupPlace(popup, place, gps, mymarker) {
     popup.on("popupclose", (e) => {
+      console.log(e);
+      console.log("init");
       const getId = e.target._leaflet_id;
-      let typeValue = "";
       const typeRadio = document.body.querySelectorAll('input[type="radio"]');
-      typeRadio.forEach((c) => {
-        if (c.checked) {
-          typeValue = c.value;
-        }
-      });
-      if (typeValue === "start") {
-        if (Array.isArray(place)) {
-          place = place.join(" ");
-        }
-        setStartPoint({
-          start: place,
-          start_gps: gps,
-          id: e.target._leaflet_id,
-        });
+      let typeValue = "";
 
-        if (address.find((a) => Object.keys(a).includes("start"))) {
-          address = address.filter((a) => !Object.keys(a).includes("start"));
-        }
-        address = [
-          ...address,
-          {
-            start: place,
-            start_gps: gps, //[gps.lat, gps.lng],
-            id: e.target._leaflet_id,
-          },
-        ];
-      } else if (typeValue === "end") {
-        if (Array.isArray(place)) {
-          place = place.join(" ");
-        }
-        setEndPoint({
-          end: place,
-          end_gps: gps, //[gps.lat, gps.lng],
-          id: e.target._leaflet_id,
-        });
-
-        if (address.find((a) => Object.keys(a).includes("end"))) {
-          address = address.filter((a) => !Object.keys(a).includes("end"));
-        }
-        address = [
-          ...address,
-          {
-            end: place,
-            end_gps: [gps.lat, gps.lng],
-            id: e.target._leaflet_id,
-          },
-        ];
-      } else if (typeValue === "remove") {
-        address = address.filter((a) => a.id !== getId);
+      const getValue = [...typeRadio].find((t) => t.checked === true);
+      if (!getValue) {
         markersLayer.current.removeLayer(mymarker);
+        return;
+      } else typeValue = getValue.value;
+
+      switch (typeValue) {
+        case "start":
+          if (Array.isArray(place)) {
+            place = place.join(" ");
+          }
+          setStartPoint({
+            start: place,
+            start_gps: gps,
+            id: e.target._leaflet_id,
+          });
+
+          if (address.find((a) => Object.keys(a).includes("start"))) {
+            address = address.filter((a) => !Object.keys(a).includes("start"));
+          }
+          address = [
+            ...address,
+            {
+              start: place,
+              start_gps: gps,
+              id: e.target._leaflet_id,
+            },
+          ];
+          console.log("fs", address);
+          break;
+
+        case "end":
+          console.log("e");
+          if (Array.isArray(place)) {
+            place = place.join(" ");
+          }
+          setEndPoint({
+            end: place,
+            end_gps: gps,
+            id: e.target._leaflet_id,
+          });
+          if (address.find((a) => Object.keys(a).includes("end"))) {
+            address = address.filter((a) => !Object.keys(a).includes("end"));
+          }
+          address = [
+            ...address,
+            {
+              end: place,
+              end_gps: [gps.lat, gps.lng],
+              id: e.target._leaflet_id,
+            },
+          ];
+          break;
+
+        case "remove":
+          if (address.length === 0) {
+            markersLayer.current.removeLayer(mymarker);
+            break;
+          }
+
+          const valueToChange = address.find((a) => a.id === getId);
+          if (valueToChange) {
+            if (Object.keys(valueToChange).includes("start")) {
+              address = address.filter((a) => a.id !== getId);
+              setStartPoint("");
+              markersLayer.current.removeLayer(mymarker);
+              return address;
+            } else if (Object.keys(valueToChange).includes("end")) {
+              address = address.filter((a) => a.id !== getId);
+              setEndPoint("");
+              markersLayer.current.removeLayer(mymarker);
+              return address;
+            } else {
+              markersLayer.current.removeLayer(mymarker);
+            }
+          } else {
+            markersLayer.current.removeLayer(mymarker);
+          }
+          markersLayer.current.removeLayer(mymarker);
+          break;
+
+        default:
+          return;
       }
       return address;
     });
@@ -314,7 +350,7 @@ export default function DisplayMap(props) {
             readOnly
             required
             value={startPoint ? startPoint.start : ""}
-            onChange={onStartChange}
+            //onChange={onStartChange}
           />
         </Form.Group>
 
@@ -326,7 +362,7 @@ export default function DisplayMap(props) {
             readOnly
             required
             value={endPoint ? endPoint.end : ""}
-            onChange={onEndChange}
+            //onChange={onEndChange}
           />
         </Form.Group>
         <Form.Control

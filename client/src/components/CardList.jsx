@@ -76,7 +76,7 @@ function CardList({ user, users, events, ...props }) {
 
     if (window.confirm("Confirm removal?")) {
       try {
-        const query = await fetch(eventsEndPoint + event.id, {
+        const query = await fetch("/api/v1/events/" + event.id, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",

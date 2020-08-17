@@ -29,8 +29,6 @@ d = c+1
 e = d+1
 f=Itinary.last.id
 
-arr_i = Array(c..e)
-
 
 Array(c..f).each do |idx|
     id = Array(a..b).sample
