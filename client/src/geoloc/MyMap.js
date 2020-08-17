@@ -127,8 +127,6 @@ export default function DisplayMap(props) {
 
   function handlePopupPlace(popup, place, gps, mymarker) {
     popup.on("popupclose", (e) => {
-      console.log(e);
-      console.log("init");
       const getId = e.target._leaflet_id;
       const typeRadio = document.body.querySelectorAll('input[type="radio"]');
       let typeValue = "";
