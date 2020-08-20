@@ -81,6 +81,4 @@ test:
 #
 production:
   <<: *default
-  database: godwd2_production
-  username: <%= ENV['DATABASE_USER'] %>
-  password: <%= ENV['DATABASE_PASSWORD'] %>
+  url: <%= ENV['POSTGRESQL_ADDON_URI'] %>

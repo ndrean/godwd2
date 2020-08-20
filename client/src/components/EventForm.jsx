@@ -6,13 +6,14 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 
-import { Image as CLImage, CloudinaryContext } from "cloudinary-react";
+//import { Image as CLImage, CloudinaryContext } from "cloudinary-react";
 import Select from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import cloudName from "../config/cloudName";
+//import cloudName from "../config/cloudName";
 
 const EventForm = (props) => {
+  console.log("render Form");
   const {
     users,
     participants,
@@ -20,9 +21,9 @@ const EventForm = (props) => {
     start,
     end,
     comment,
-    loading,
+    //loading,
     previewCL,
-    publicID,
+    //publicID,
     onFormSubmit,
     onhandleItinaryChange,
     onhandleCommentChange,
@@ -30,10 +31,10 @@ const EventForm = (props) => {
     onhandlePictureCL,
   } = props;
 
-  // console.log("render Form");
   // setup SELECT
   const options = [],
     defaultOpt = [];
+
   users.forEach((u) => options.push({ value: u.email, label: u.email }));
   if (participants) {
     participants.forEach((p) =>
@@ -82,7 +83,7 @@ const EventForm = (props) => {
         <Form.Group controlId="ControlKiters">
           <Form.Label>Participants</Form.Label>
           <Select
-            defaultValue={defaultOpt}
+            //defaultValue={defaultOpt}
             isMulti
             name="participants"
             options={options}

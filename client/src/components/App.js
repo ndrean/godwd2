@@ -53,12 +53,18 @@ export default function App() {
   }, []);
 
   // get currentUser in the child component App>MyNavBar>LoginForm and takes it up back here to update
-  function handleAddUser(currentUser) {
-    setUser(currentUser);
-    if (!users.find((user) => user.email === currentUser.email)) {
-      setUsers((prev) => [...prev, currentUser]);
-    }
-  }
+  //function handleAddUser(currentUser) {
+  const handleAddUser = React.useCallback(
+    (currentUser) => {
+      setUser(currentUser);
+      if (!users.find((user) => user.email === currentUser.email)) {
+        setUsers((prev) => [...prev, currentUser]);
+      }
+    },
+    [users]
+  );
+
+  //}
 
   function handleRemoveEvent(event) {
     console.log("*removeEvt*");

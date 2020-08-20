@@ -53,4 +53,4 @@ function MyNavBar({
   );
 }
 
-export default MyNavBar;
+export default React.memo(MyNavBar);

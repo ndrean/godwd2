@@ -103,13 +103,19 @@ function CardList({ user, users, events, ...props }) {
   // POST or PATCH the modal form:
   /* => object formdata to pass to the backend
     {event: {
-      itinary_attributes:{date:xxx, start:xxx, end:xxx, start_gps:[x,x], end_gps:[x,x]}
+      itinary_attributes:{
+        date:xxx, 
+        start:xxx, end:xxx, 
+        start_gps:[x,x], 
+        end_gps:[x,x]
+        distance}
       participants:[{email:xxx,notif:bool}, {...}],
       photo : "http://res.cloudinary.com/xxx",
       directClURL, publicID, comment
     */
 
   async function handleFormSubmit(e) {
+    console.log("*submit*");
     e.preventDefault();
     setLoading(true);
 
@@ -145,6 +151,7 @@ function CardList({ user, users, events, ...props }) {
 
     // 2d promise: POST photo to CL, receives link back , and append FormData
     async function upLoadToCL(ffd) {
+      console.log("*upload*");
       if (changed) {
         // boolean: changed <=> new file input for CL
         const newfd = new FormData();
@@ -208,10 +215,11 @@ function CardList({ user, users, events, ...props }) {
     handleClose(); // reset
   }
 
-  useEffect(() => {}, [events, user]);
+  //useEffect(() => {}, [events, user]);
 
   // Edit event
   async function handleEdit(event) {
+    console.log("*edit*");
     setIndexEdit(event.id); // get /api/v1/events/:id
     const data = events.find((ev) => ev.id === event.id);
     setItinary({
@@ -232,6 +240,7 @@ function CardList({ user, users, events, ...props }) {
   }
 
   function handleSelectChange(selectedOptions) {
+    console.log("*select*");
     if (selectedOptions) {
       const kiters = [];
       selectedOptions.forEach((selOpt) => {
@@ -256,6 +265,7 @@ function CardList({ user, users, events, ...props }) {
 
   // update dynamically key/value for date, start, end of itinary
   function handleItinaryChange(e) {
+    console.log("*itinary*");
     setItinary({
       ...itinary,
       [e.target.name]: e.target.value,
@@ -267,6 +277,7 @@ function CardList({ user, users, events, ...props }) {
   }
 
   async function handlePictureCL(e) {
+    console.log("*pic*");
     if (e.target.files[0]) {
       setPreviewCL(URL.createObjectURL(e.target.files[0]));
       setChanged(true);
@@ -277,6 +288,7 @@ function CardList({ user, users, events, ...props }) {
   // send mail to ask to join an event
   // added index, modaldId to args
   async function handlePush(index, modalId, event) {
+    console.log("*push*");
     const check = checkUserDemand(index, modalId, event);
     console.log(check);
     setCheckUser(check);
@@ -308,6 +320,7 @@ function CardList({ user, users, events, ...props }) {
   }
 
   function checkUserDemand(index, modalId, event) {
+    console.log("*check*");
     console.log(index, modalId);
     if (index !== modalId) return null;
     console.log("*check*");
@@ -338,21 +351,30 @@ function CardList({ user, users, events, ...props }) {
       ) : (
         <>
           <br /> */}
-      {/* style={{ justifyContent: "center" }}*/}
+      {/* style={{ justifyContent: "center" }}
+      className="justify-content-md-center"
+      */}
       <Container>
-        <Row className="justify-content-md-center">
+        <Row style={{ justifyContent: "center" }}>
           <Button
             variant="outline-dark"
             onClick={handleShow}
             style={{ fontSize: "30px" }}
           >
-            <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span>
-          </Button>
-          {loading ? (
-            <Col xs={10} className="justify-content-md-center">
+            {loading ? (
               <Spinner animation="border" role="status">
                 <span className="sr-only">Loading...</span>
               </Spinner>
+            ) : (
+              <p>
+                <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span>
+              </p>
+            )}
+            {/* <FontAwesomeIcon icon={faCheck} /> <span> Create an event</span> */}
+          </Button>
+          {loading ? (
+            <Col xs={10} style={{ justifyContent: "center" }}>
+              <span className="sr-only">Loading...</span>
             </Col>
           ) : (
             <EventModal show={show && !loading} onhandleClose={handleClose}>

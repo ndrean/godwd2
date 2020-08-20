@@ -215,3 +215,43 @@ Go to Cloudinary dashboard and download cloudinary.yml and place it into '/confi
 # ActionMailer
 
 <https://dev.to/morinoko/sending-emails-in-rails-with-action-mailer-and-gmail-35g4>
+
+# bug Select
+
+index.js:1 Warning: Legacy context API has been detected within a strict-mode tree.
+
+The old API will be supported in all 16.x releases, but applications using it should migrate to the new version.
+
+Please update the following components: MenuPlacer
+
+Learn more about this warning here: https://fb.me/react-legacy-context
+in MenuPlacer (created by Select)
+in div (created by Context.Consumer)
+in EmotionCssPropInternal (created by SelectContainer)
+in SelectContainer (created by Select)
+in Select (created by StateManager)
+in StateManager (at EventForm.jsx:84)
+in div (created by FormGroup)
+in FormGroup (at EventForm.jsx:82)
+in form (created by Form)
+in Form (at EventForm.jsx:46)
+in EventForm (at CardList.jsx:368)
+in div (created by ModalBody)
+in ModalBody (at EventModal.jsx:16)
+in div (created by ModalDialog)
+in div (created by ModalDialog)
+in ModalDialog (created by Modal)
+in div (created by Modal)
+in Transition (created by Fade)
+in Fade (created by DialogTransition)
+in DialogTransition (created by Modal)
+in Modal (created by Modal)
+in Modal (at EventModal.jsx:8)
+in EventModal (at CardList.jsx:366)
+in div (created by Row)
+in Row (at CardList.jsx:351)
+in div (created by Container)
+in Container (at CardList.jsx:350)
+in CardList (at App.js:93)
+in App (at src/index.js:41)
+in StrictMode (at src/index.js:40)
