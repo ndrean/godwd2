@@ -1,7 +1,5 @@
 {
     "deploy": {
-        "rakegoals": ["db:migrate"],
-        "sidekiq": true,
-        "redis": true
+        "rakegoals": ["db:migrate"]
     }
 }
