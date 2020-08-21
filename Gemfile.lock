@@ -233,7 +233,6 @@ DEPENDENCIES
   sidekiq-failures (~> 1.0)
   spring
   spring-watcher-listen (~> 2.0.0)
-  tzinfo-data
 
 RUBY VERSION
    ruby 2.6.6p146
