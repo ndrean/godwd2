@@ -1,6 +1,7 @@
-#
-clevercloud / ruby.json {
+{
     "deploy": {
-        "rakegoals": ["assets:precompile", "db:migrate"]
+        "rakegoals": ["db:migrate"],
+        "sidekiq": true,
+        "redis": true
     }
 }
