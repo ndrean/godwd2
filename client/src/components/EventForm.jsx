@@ -35,11 +35,13 @@ const EventForm = (props) => {
   const options = [],
     defaultOpt = [];
 
-  users.forEach((u) => options.push({ value: u.email, label: u.email }));
-  if (participants) {
-    participants.forEach((p) =>
-      defaultOpt.push({ value: p.email, label: p.email })
-    );
+  if (users && users.length > 0) {
+    users.forEach((u) => options.push({ value: u.email, label: u.email }));
+    if (participants) {
+      participants.forEach((p) =>
+        defaultOpt.push({ value: p.email, label: p.email })
+      );
+    }
   }
 
   return (

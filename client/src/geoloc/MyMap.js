@@ -85,7 +85,7 @@ export default function DisplayMap(props) {
         handlePopupPlace(popup, place, gps, resultMarker);
       }
     });
-  }, []);
+  }, [html]);
 
   // find address on click with reverseGeocode (ESRI)
   useEffect(() => {
@@ -330,8 +330,8 @@ export default function DisplayMap(props) {
       .catch((err) => console.log(err));
   }
 
-  function onStartChange() {}
-  function onEndChange() {}
+  //function onStartChange() {}
+  //function onEndChange() {}
 
   function handleDate(e) {
     setDate(e.target.value);
