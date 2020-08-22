@@ -1,25 +1,21 @@
-# overmind
+# Running in dev mode:
 
-`overind start` will run the `ProcFile`:
+The Rails API will run on port 3001 and the React fron end will run on port 3000. The Sidekiq background adapter along with Redis will run as a worker.
+We wil use `racks-cors` to enable cross-site ('/config/initializers/cors.rb') and the endpoints will be `/api/v1/...`.
 
-````
-#ProcFile
-web: cd client && PORT=3000 yarn run start
-api: PORT=3001 && bundle exec rails s
-worker: bundle exec sidekiq
-redis: redis-server --port 6379
-```
+## Puma
 
-# Docker
+In `/config/puma.rb`, change port to 3001: `port ENV.fetch("PORT") { 3001 }`
 
-<https://dev.to/raphael_jambalos/more-than-hello-world-in-docker-run-rails-sidekiq-web-apps-in-docker-1b37>
+## Sidekiq
 
-# OINK
+In './config/application', declare `config.active_job.queue_adapter = :sidekiq`
 
-Inspection of Active Record
-<https://github.com/noahd1/oink/>
+In '/config/Dev-prod', provide `routes.default_url_options[:host] = 'http://localhost:3001'` (otherwise you get ActionView::Template::error missing link, provide :hst parameter, set default_url_options[:host])
 
-# Redis
+## Redis
+
+To provision Redis by the provider.
 
 ```
 # /config.redis.yml
@@ -34,19 +30,76 @@ production:
   port: ‘6379’
 ```
 
-# Puma
+## CLoudinary
 
-In `puma.rb`, change port to 3001: `port ENV.fetch("PORT") { 3001 }`
+All images corresponding to an event are saved in Cloudinary. We don't use ActiveStorage and we access directly to Cloudinary to save images. We only save the `publicID` and the 'url'.
+We permit only one image by event, uploaded from the front end, so if we upload another image, we first destroy the image from Cloudinary and upload a new one. From the account,download `cloudinary.yml` and place it into '/config/cloudinary.yml'.
+We use only one background job, defined into '/app/jobs/remove_direct_link.rb' and use `RemoveDirectLink.perform_later(event.publicId)` in the controller (where `publicID` is the ID of the image given by Cloudinary).
 
-# Sidekiq
+# ActionMailer
 
-In './config/application', declare `config.active_job.queue_adapter = :sidekiq`
+All the mailing jobs can be found in '/app/mailers/' folder, with `event_mailer.rb` ('invitation' and 'demand') and `user_mailer.rb` ('register' and 'accept'). Then we define the corresponding 'html.erb' view in '/app/views/event_mailer/demand_html.erb', '/app/views/event_mailer/invitation.html.erb', '/app/views/user_mailer/register.html.erb', '/app/views/user_mailer/accept.html.erb').
 
-In '/config/Dev-prod', provide `routes.default_url_options[:host] = 'http://localhost:3001'` (otherwise you get ActionView::Template::error missing link, provide :hst parameter, set default_url_options[:host])
+We generate a secure token with `SecureRandom.urlsafe_base64.to_s` and append this token to a link in the mail. We store this token in the database. We append to the link the token with the needed info so the controller method of the endpoint can run:
+`<a href=<%="#{ENV['DOMAIN_HOST']}/api/v1/confirmDemand?name=#{@owner}&ptoken=#{@token}&user=#{@user}&itinary=#{@itinary.id}"%>>link</a>`
+<https://dev.to/morinoko/sending-emails-in-rails-with-action-mailer-and-gmail-35g4>
+
+## overmind
+
+Launch with one command Postgres, Sidekiq, Redis, Rails/Puma server, webpack-dev-server with: `overind start` which will run the `Procfile`:
+
+```
+#Procfile
+web: cd client && PORT=3000 yarn run start
+api: PORT=3001 && bundle exec rails s
+worker: bundle exec sidekiq
+redis: redis-server --port 6379
+```
+
+### foreman
+
+Alternatively, we can use the gem `foreman` and run `foreman start`
+
+> Do not install `foreman` in the `Gemfile`
+
+but do:
+
+```bash
+> gem install foreman
+> bundle install
+```
+
+Append the `Procfile` with the required processes (React front end, Rails API back end, Sidekiq...):
+
+```
+# Procfile
+web: cd client && PORT=3000 yarn run start
+api: PORT=3001 && bundle exec rails s
+worker: sidekiq (-t 25)?
+```
+
+and run `foreman start` to run both Weback and Rails servers.
+For production: <http://blog.daviddollar.org/2011/05/06/introducing-foreman.html>
+
+# Docker
+
+To be done...
+<https://dev.to/raphael_jambalos/more-than-hello-world-in-docker-run-rails-sidekiq-web-apps-in-docker-1b37>
+
+# OINK
+
+Inspection of Active Record: see <https://github.com/noahd1/oink/>
+
+# Secrets-credentials
+
+Run `EDITOR="code --wait" bin/rails credentials=edit`
+Within `'rails c`, we can access `Rails.application.secrets.secret_key_base`for example.
+
+The gem `dotenv-rails` is used for the `#env` file.
 
 # Knock
 
-gem bcrypt, jwt, knock, dotnev-rails, racks-cors
+We use the gems `bcrypt`, `jwt`, `knock`.
 
 ```bash
 > rails g knock:install
@@ -116,7 +169,11 @@ Rails.application.routes.draw do
 end
 ```
 
-# Bootstrap
+# Front end
+
+Create a folder `/client`.
+
+## Bootstrap
 
 Install in `/client`:
 
@@ -136,30 +193,7 @@ and use for example:
 import Button from "react-bootstrap/Button";
 ```
 
-# foreman
-
-To use one command to launch Rails, webpack-dev-server, Sidekiq, we use the gem `foreman` and create a file `Procfile` (located at the root of the project).
-
-Do not install `foreman` in the `Gemfile` but do:
-
-```bash
-> gem install foreman
-> bundle install
-```
-
-Append the `ProcFile` with the required processes (React front end, Rails API back end, Sidekiq...):
-
-```
-# ProcFile
-web: cd client && PORT=3000 yarn run start
-api: PORT=3001 && bundle exec rails s
-worker: sidekiq (-t 25)?
-```
-
-and run `foreman start` to run both Weback and Rails servers.
-For production: <http://blog.daviddollar.org/2011/05/06/introducing-foreman.html>
-
-# React-Modal-Login
+## React-Modal-Login
 
 Client side:
 
@@ -173,7 +207,7 @@ yarn add react-modal-login
 > kill -9 $(lsof -t -i tcp:3001)
 ```
 
-# Fontawesome
+## Fontawesome
 
 client:
 
@@ -201,57 +235,8 @@ then don't need to import, just use strings
 <FontAwesomeIcon icon="coffee" />
 ```
 
-# CLoudinary
-
-Go to Cloudinary dashboard and download cloudinary.yml and place it into '/config/cloudinary.yml'.
-
 # Local SSL certificate (macOS)
 
 <https://flaviocopes.com/macos-install-ssl-local/>
 
 > Change `http://localhost:3000/api/v1/..` to `/api/v1/...` in all `fetch` requests.
-````
-
-# ActionMailer
-
-<https://dev.to/morinoko/sending-emails-in-rails-with-action-mailer-and-gmail-35g4>
-
-# bug Select
-
-index.js:1 Warning: Legacy context API has been detected within a strict-mode tree.
-
-The old API will be supported in all 16.x releases, but applications using it should migrate to the new version.
-
-Please update the following components: MenuPlacer
-
-Learn more about this warning here: https://fb.me/react-legacy-context
-in MenuPlacer (created by Select)
-in div (created by Context.Consumer)
-in EmotionCssPropInternal (created by SelectContainer)
-in SelectContainer (created by Select)
-in Select (created by StateManager)
-in StateManager (at EventForm.jsx:84)
-in div (created by FormGroup)
-in FormGroup (at EventForm.jsx:82)
-in form (created by Form)
-in Form (at EventForm.jsx:46)
-in EventForm (at CardList.jsx:368)
-in div (created by ModalBody)
-in ModalBody (at EventModal.jsx:16)
-in div (created by ModalDialog)
-in div (created by ModalDialog)
-in ModalDialog (created by Modal)
-in div (created by Modal)
-in Transition (created by Fade)
-in Fade (created by DialogTransition)
-in DialogTransition (created by Modal)
-in Modal (created by Modal)
-in Modal (at EventModal.jsx:8)
-in EventModal (at CardList.jsx:366)
-in div (created by Row)
-in Row (at CardList.jsx:351)
-in div (created by Container)
-in Container (at CardList.jsx:350)
-in CardList (at App.js:93)
-in App (at src/index.js:41)
-in StrictMode (at src/index.js:40)
