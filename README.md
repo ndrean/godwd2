@@ -214,10 +214,24 @@ Client side:
 yarn add react-modal-login
 ```
 
-# Kill Rails
+To define a list of users to be displayed, define `options` and fill with:
 
+```js
+users.forEach((u) => options.push({ value: u.email, label: u.email }));
 ```
-> kill -9 $(lsof -t -i tcp:3001)
+
+and `import Select from 'react-select'` and use:
+
+```js
+<Select
+  //defaultValue={defaultOpt}
+  isMulti
+  name="participants"
+  options={options}
+  className="basic-multi-select"
+  classNamePrefix="select"
+  onChange={onSelectChange}
+/>
 ```
 
 ## Fontawesome
@@ -248,7 +262,15 @@ then don't need to import, just use strings
 <FontAwesomeIcon icon="coffee" />
 ```
 
-# Local SSL certificate (macOS)
+# Misc:
+
+## Kill Rails
+
+```
+> kill -9 $(lsof -t -i tcp:3001)
+```
+
+## Local SSL certificate (macOS)
 
 <https://flaviocopes.com/macos-install-ssl-local/>
 
