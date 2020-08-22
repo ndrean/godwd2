@@ -1,27 +1,51 @@
 {
-  "dependencies": {},
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "npm": "6.9.0",
+    "node": "12.3.1"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/free-solid-svg-icons": "^5.14.0",
+    "@fortawesome/react-fontawesome": "^0.1.11",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "bootstrap": "^4.5.0",
+    "cloudinary-react": "^1.6.6",
+    "esri-leaflet-geocoder": "^2.3.3",
+    "history": "^5.0.0",
+    "leaflet": "^1.6.0",
+    "react": "^16.13.1",
+    "react-bootstrap": "^1.3.0",
+    "react-dom": "^16.13.1",
+    "react-modal-login": "^1.4.5",
+    "react-scripts": "3.4.1",
+    "react-select": "^3.1.0",
+    "universal-router": "^9.0.1"
+  },
   "scripts": {
-    "build": "yarn --cwd client install && yarn --cwd client build",
-    "deploy": "cp -a client/build/. public/",
-    "heroku-postbuild": "yarn build && yarn deploy"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "name": "godwd2",
-  "description": "The Rails API will run on port 3001 and the React fron end will run on port 3000. The Sidekiq background adapter along with Redis will run as a worker. We wil use `racks-cors` to enable cross-site ('/config/initializers/cors.rb') and the endpoints will be `/api/v1/...`.",
-  "version": "1.0.0",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib"
+  "proxy": "https://agile-cove-18403.herokuapp.com/",
+  "eslintConfig": {
+    "extends": "react-app"
   },
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ndrean/godwd2.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ndrean/godwd2/issues"
-  },
-  "homepage": "https://github.com/ndrean/godwd2#readme"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

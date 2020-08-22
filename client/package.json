@@ -32,7 +32,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://127.0.0.1:3001",
+  "proxy": "https://agile-cove-18403.herokuapp.com/",
   "eslintConfig": {
     "extends": "react-app"
   },

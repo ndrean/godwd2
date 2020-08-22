@@ -7,7 +7,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins 'localhost:3000','127.0.0.1:3000','godownwind.online'
+    origins 'localhost:3000','127.0.0.1:3000','godownwind.online', 'https://unruffled-poitras-717474.netlify.app/'
 
     resource '/api/v1/*',
       headers: :any,
