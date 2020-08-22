@@ -3,6 +3,8 @@
 The Rails API will run on port 3001 and the React fron end will run on port 3000. The Sidekiq background adapter along with Redis will run as a worker.
 We wil use `racks-cors` to enable cross-site ('/config/initializers/cors.rb') and the endpoints will be `/api/v1/...`.
 
+We also use the process manager `overmind` (<https://github.com/DarthSim/overmind>) to run several processes (Rails, Sidekiq, Redis) in a single terminal with the use of a `Profile`.
+
 ## Puma
 
 In `/config/puma.rb`, change port to 3001: `port ENV.fetch("PORT") { 3001 }`
@@ -32,6 +34,12 @@ production:
 
 ## Cloudinary
 
+```ruby
+#/config/storage.yml
+cloudinary:
+  service: Cloudinary
+```
+
 All images corresponding to an event are saved in Cloudinary. We don't use ActiveStorage and we access directly to Cloudinary to save images. We only save the the 'url' and `publicID` ( this is the ID of the image given by Cloudinary).
 
 We permit only one image by event, uploaded from the front end, so if we upload another image, we first destroy the image from Cloudinary and upload a new one. We use a background job, defined into '/app/jobs/remove_direct_link.rb' and use `RemoveDirectLink.perform_later(event.publicId)` in the controller .
@@ -57,7 +65,9 @@ We generate a secure token with `SecureRandom.urlsafe_base64.to_s` and append th
 
 <https://dev.to/morinoko/sending-emails-in-rails-with-action-mailer-and-gmail-35g4>
 
-## overmind
+## Process manager: overmind
+
+<https://github.com/DarthSim/overmind>
 
 Launch with one command Postgres, Sidekiq, Redis, Rails/Puma server, webpack-dev-server with: `overind start` which will run the `Procfile`:
 
@@ -69,7 +79,7 @@ worker: bundle exec sidekiq
 redis: redis-server --port 6379
 ```
 
-### foreman
+### Process manager: foreman
 
 Alternatively, we can use the gem `foreman` and run `foreman start`
 
@@ -99,14 +109,29 @@ For production: <http://blog.daviddollar.org/2011/05/06/introducing-foreman.html
 To be done...
 <https://dev.to/raphael_jambalos/more-than-hello-world-in-docker-run-rails-sidekiq-web-apps-in-docker-1b37>
 
-# OINK
+# Misc gems:
 
-Inspection of Active Record: see <https://github.com/noahd1/oink/>
+> `OINK`: Inspection of Active Record: see <https://github.com/noahd1/oink/>
+> You can also initialize it with an optional logger instance enabling your application to write Oink log entries to your application's default log file:
 
-# Secrets-credentials
+```ruby
+#/config/application.rb
+middleware.use( Oink::Middleware, :logger => Rails.logger)
+```
 
-Run `EDITOR="code --wait" bin/rails credentials=edit`
-Within `'rails c`, we can access `Rails.application.secrets.secret_key_base`for example.
+Run òink --threshold=5 /tmp/logs/\*` to find all actions which increase the heap size more than 5 MB, where log files are located in '/tmp/logs/'.
+
+> `Bullet`: Inpsection of number of queries - dev mode only
+
+```ruby
+#/config/environments/development.rb
+config.after_initialize do
+    Bullet.enable = true
+    Bullet.rails_logger = true
+  end
+```
+
+> `dotven-rails`: keep secrets crypted with app ` secret_key_base`` Run `EDITOR="code --wait" bin/rails credentials=edit`Within`'rails c`, we can access`Rails.application.secrets.secret_key_base`for example.
 
 The gem `dotenv-rails` is used for the `#env` file.
 
