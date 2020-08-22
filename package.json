@@ -4,5 +4,24 @@
     "build": "yarn --cwd client install && yarn --cwd client build",
     "deploy": "cp -a client/build/. public/",
     "heroku-postbuild": "yarn build && yarn deploy"
-  }
+  },
+  "name": "godwd2",
+  "description": "The Rails API will run on port 3001 and the React fron end will run on port 3000. The Sidekiq background adapter along with Redis will run as a worker. We wil use `racks-cors` to enable cross-site ('/config/initializers/cors.rb') and the endpoints will be `/api/v1/...`.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ndrean/godwd2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ndrean/godwd2/issues"
+  },
+  "homepage": "https://github.com/ndrean/godwd2#readme"
 }
