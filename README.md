@@ -300,3 +300,9 @@ then don't need to import, just use strings
 <https://flaviocopes.com/macos-install-ssl-local/>
 
 > Change `http://localhost:3000/api/v1/..` to `/api/v1/...` in all `fetch` requests.
+
+# Heroku
+
+```bash
+git remote rm herokusomething
+```
