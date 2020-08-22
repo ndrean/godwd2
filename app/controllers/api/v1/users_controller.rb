@@ -49,7 +49,7 @@ class Api::V1::UsersController < ApplicationController
     render json: { status: 401 }
   end
     
-  # GET '/api/v1/ConfirmDemand'
+  # GET '/api/v1/mailconfirmation
   # token sent via link via mail from user to confirm register
   def confirmed_email
     user = User.find_by(confirm_token: params[:mail_token])

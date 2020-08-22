@@ -30,18 +30,31 @@ production:
   port: ‘6379’
 ```
 
-## CLoudinary
+## Cloudinary
 
-All images corresponding to an event are saved in Cloudinary. We don't use ActiveStorage and we access directly to Cloudinary to save images. We only save the `publicID` and the 'url'.
-We permit only one image by event, uploaded from the front end, so if we upload another image, we first destroy the image from Cloudinary and upload a new one. From the account,download `cloudinary.yml` and place it into '/config/cloudinary.yml'.
-We use only one background job, defined into '/app/jobs/remove_direct_link.rb' and use `RemoveDirectLink.perform_later(event.publicId)` in the controller (where `publicID` is the ID of the image given by Cloudinary).
+All images corresponding to an event are saved in Cloudinary. We don't use ActiveStorage and we access directly to Cloudinary to save images. We only save the the 'url' and `publicID` ( this is the ID of the image given by Cloudinary).
+
+We permit only one image by event, uploaded from the front end, so if we upload another image, we first destroy the image from Cloudinary and upload a new one. We use a background job, defined into '/app/jobs/remove_direct_link.rb' and use `RemoveDirectLink.perform_later(event.publicId)` in the controller .
+
+Settings: from the account,download `cloudinary.yml` and place it into '/config/cloudinary.yml'.
 
 # ActionMailer
 
-All the mailing jobs can be found in '/app/mailers/' folder, with `event_mailer.rb` ('invitation' and 'demand') and `user_mailer.rb` ('register' and 'accept'). Then we define the corresponding 'html.erb' view in '/app/views/event_mailer/demand_html.erb', '/app/views/event_mailer/invitation.html.erb', '/app/views/user_mailer/register.html.erb', '/app/views/user_mailer/accept.html.erb').
+All the mailing jobs can be found in '/app/mailers/' folder, with `event_mailer.rb` and `user_mailer.rb`. We defined methods that use short arguments (used by `Redis`):
 
-We generate a secure token with `SecureRandom.urlsafe_base64.to_s` and append this token to a link in the mail. We store this token in the database. We append to the link the token with the needed info so the controller method of the endpoint can run:
-`<a href=<%="#{ENV['DOMAIN_HOST']}/api/v1/confirmDemand?name=#{@owner}&ptoken=#{@token}&user=#{@user}&itinary=#{@itinary.id}"%>>link</a>`
+- `invitation` : the creator/owner on an event sends a mail to invite buddies. This is sent on every change of the event.
+- `demand`: a user sends a mail to the creator to ask to join. This uses a token. The owner receives this mail and clicks on the link to accept the demand (via the token, the endpoint 'users_controllers/confirmdemand' updates the database).
+- `register`: when a new user wants to sign-up, we send a mail with a link/token so the user clicks on the link to confirm registration and sends a token to 'users_controller/confirmed_email'
+- `accept`: a mail sent to a user when the owner accepts a buddie to join his event
+
+We defined the corresponding 'html.erb' view in '/app/views/event_mailer/demand_html.erb', '/app/views/event_mailer/invitation.html.erb', '/app/views/user_mailer/register.html.erb', '/app/views/user_mailer/accept.html.erb').
+
+We generate a secure token with `SecureRandom.urlsafe_base64.to_s` and append this token to a link in the mail. We store this token in the database. We append to the link the token with the needed info so the controller method of the endpoint can run. For example:
+
+```
+<a href=<%="#{ENV['DOMAIN_HOST']}/api/v1/confirmDemand?name=#{@owner}&ptoken=#{@token}&user=#{@user}&itinary=#{@itinary.id}"%>>link</a>
+```
+
 <https://dev.to/morinoko/sending-emails-in-rails-with-action-mailer-and-gmail-35g4>
 
 ## overmind
