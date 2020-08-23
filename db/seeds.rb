@@ -26,9 +26,9 @@ Array(a..b).each { |i| kiters << User.find(i).email}
 
 puts kiters
 c= Itinary.first.id
-d = c+1
-e = d+1
-f = e+1
+#d = c+1
+#e = d+1
+#f = e+1
 g=Itinary.last.id
 
 
@@ -36,7 +36,7 @@ Array(c..g).each do |idx|
     id = Array(a..b).sample
     participants = []
     kiters.each { |k| participants << {email: k, notif: true, ptoken:""}}
-    Event.create!(user: User.find(id), itinary: Itinary.find(idx), participants: participants)
+    Event.create!(user: User.find(id), itinary: Itinary.find(id), participants: participants)
     
 end
 
