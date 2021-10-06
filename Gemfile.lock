@@ -79,7 +79,7 @@ GEM
       aws_cf_signer
       rest-client
     concurrent-ruby (1.1.7)
-    connection_pool (2.2.3)
+    connection_pool (2.2.5)
     crass (1.0.6)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
@@ -181,7 +181,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    sidekiq (6.1.1)
+    sidekiq (6.2.1)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
